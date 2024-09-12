@@ -84,6 +84,7 @@ class PropertyDatabase:
         print(f"\n TITLE NUMBER {title_number} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:\n")
         format_owner_data_output(result)
         print(f"\n THE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
+        print("******")
 
     def company_search(self, company=None):
         if company is None:
@@ -142,5 +143,7 @@ class PropertyDatabase:
         print(f"\n{company} IS INCORPORATED IN {country}\n")
         print("\nTHE COMPANY OWNS THE FOLLOWING PROPERTIES:\n")
         print(table)
+        print()
+        print("******")
 if __name__ == "__main__":
     db = PropertyDatabase()
