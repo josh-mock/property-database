@@ -32,7 +32,7 @@ class PropertyDatabase:
 
         def get_address(result: pd.DataFrame) -> str:
             address = result["address"].values[0]
-            return address if not pd.isna(address) else "No data"
+            return wrap_text(address.upper(), width=60) if not pd.isna(address) else "No data"
 
         def get_price(result: pd.DataFrame) -> str:
             price = result["price"].values[0]
@@ -124,7 +124,7 @@ class PropertyDatabase:
                 return f"GBP {price:,.0f}" if not pd.isna(price) else "No data"
 
             def get_address(address: str) -> str:
-                return wrap_text(address.upper(), width=30) if not pd.isna(address) else "No data"
+                return wrap_text(address.upper(), width=60) if not pd.isna(address) else "No data"
 
             for title in raw:
                 title["ADDRESS"] = get_address(title["ADDRESS"])

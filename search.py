@@ -30,7 +30,6 @@ def menu(database: pd.DataFrame):
             print("\nOPTION NOT AVAILABLE")
 
 def main():
-    print("\nLoading...\n")
     database = PropertyDatabase()
     menu(database)
 
