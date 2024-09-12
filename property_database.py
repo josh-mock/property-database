@@ -144,6 +144,5 @@ class PropertyDatabase:
         print("\nTHE COMPANY OWNS THE FOLLOWING PROPERTIES:\n")
         print(table)
         print()
-        print("******")
 if __name__ == "__main__":
     db = PropertyDatabase()
