@@ -4,6 +4,9 @@ import sys
 from tabulate import tabulate
 import textwrap
 
+def wrap_text(text, width=30):
+    return "\n".join(textwrap.wrap(text, width))
+
 class PropertyDatabase:
     # Constants
     OWNERS = pd.read_parquet(r"data/owners.parquet")
@@ -15,8 +18,7 @@ class PropertyDatabase:
         self.titles = PropertyDatabase.TITLES
         self.titles_owners = PropertyDatabase.TITLES_OWNERS
 
-    def wrap_text(text, width=30):
-        return "\n".join(textwrap.wrap(text, width))
+
 
     def title_search(self, title_number=None):
         if title_number is None:
