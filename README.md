@@ -1,5 +1,5 @@
 # UK Land Registry CCOD and OCOD Database
-Version: 1.0.0
+Version: 1.0.1
 
 This project builds a database for searching the CCOD and OCOD datasets released by the [UK Land Registry](https://use-land-property-data.service.gov.uk/).
 
@@ -51,7 +51,7 @@ The user enters a company name via `input()`. The function then searches the `Pr
 - The price last paid to acquire the property associated with that title number
 
 ## Future improvements
-- **Chunking**: `build.py` is memory intensive in the loading and saving to parquet sections. Chunking would reduce memory usage in the process. 
+- **Chunking**: `build.py` is memory intensive in the loading and saving to parquet sections. Chunking would reduce memory usage in the process.
 - **Fuzzy search**: The dataset contains errors including misspelled company names. Users currently have to enter the company name exactly as it is in the database to use `company_search()`. A fuzzy search function would allow users more flexibility when searching by company name.
 - **Export ability**: Users will be able to export search results in a variety of file formats.
 - **Graphical User Interface**: Creating  a GUI will make the search function more user friendly.
