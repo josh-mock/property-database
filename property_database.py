@@ -22,7 +22,7 @@ class PropertyDatabase:
 
     def title_search(self, title_number=None):
         if title_number is None:
-            title_number = input("ENTER TITLE NUMBER: ")
+            title_number = input("ENTER TITLE NUMBER: ").upper()
 
         def get_title_data():
             result = self.titles[self.titles["title_number"] == title_number]
@@ -88,7 +88,7 @@ class PropertyDatabase:
 
     def company_search(self, company=None):
         if company is None:
-            company = input("ENTER COMPANY NAME: ")
+            company = input("ENTER COMPANY NAME: ").upper()
         def get_company_data():
             result = self.owners[self.owners["owner"] == company]
             if result.empty:
