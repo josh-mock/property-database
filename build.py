@@ -215,7 +215,6 @@ def save_to_parquet(df: pd.DataFrame, file_path: str):
 
 def main():
     # Get csv files from the dataset using the API
-    print("Loading...")
     year = get_valid_year()
     month = get_valid_month()
     api_key = get_valid_api_key()
@@ -235,7 +234,7 @@ def main():
     print("Loading OCOD dataset...")
     ocod_df = load_data("ocod.csv",
                         ocod_columns_to_load, dtype_dict, "OCOD")
-    print("Loading CCOD dataset")
+    print("Loading CCOD dataset...")
     ccod_df = load_data("ccod.csv",
                         ccod_columns_to_load, dtype_dict, "CCOD")
 
