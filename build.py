@@ -215,13 +215,14 @@ def save_to_parquet(df: pd.DataFrame, file_path: str):
 
 def main():
     # Get csv files from the dataset using the API
-
+    print("Loading...")
     year = get_valid_year()
     month = get_valid_month()
     api_key = get_valid_api_key()
 
-    print("Downloading datasets...")
+    print("Downloading OCOD dataset...")
     get_csv_files("ocod", year, month, api_key)
+    print("Downloading CCOD dataset...")
     get_csv_files("ccod", year, month, api_key)
 
     ocod_columns_to_load = ["Title Number", "Property Address", "Price Paid", "Proprietor Name (1)", "Proprietor Name (2)", "Proprietor Name (3)", "Proprietor Name (4)",
@@ -231,18 +232,21 @@ def main():
     dtype_dict = {"Title Number": "string", "Property Address": "string", "Price Paid": "float", "Proprietor Name (1)": "string", "Proprietor Name (2)": "string", "Proprietor Name (3)": "string", "Proprietor Name (4)": "string",
                   "Country Incorporated (1)": "string", "Country Incorporated (2)": "string", "Country Incorporated (3)": "string", "Country Incorporated (4)": "string"}
 
-    print("Loading datasets...")
+    print("Loading OCOD dataset...")
     ocod_df = load_data("ocod.csv",
                         ocod_columns_to_load, dtype_dict, "OCOD")
+    print("Loading CCOD dataset")
     ccod_df = load_data("ccod.csv",
                         ccod_columns_to_load, dtype_dict, "CCOD")
 
     print("Merging datasets...")
     combined_data = concatenate(ocod_df, ccod_df)
 
-    print("Creating database tables...")
+    print("Creating database table: titles...")
     titles = create_titles_table(combined_data)
+    print("Creating database table: owners...")
     owners = create_owners_table(combined_data)
+    print("Creating database table: titles_owners...")
     titles_owners = create_titles_owners_table(combined_data, titles, owners)
 
     print("Saving database tables as parquet files...")

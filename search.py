@@ -1,6 +1,6 @@
 # COPYRIGHT (C) 2024 JOSHUA MOCK MIT LICENSE
 import pandas as pd
-from src.database.property_database import PropertyDatabase
+from property_database import PropertyDatabase
 
 def menu(database: pd.DataFrame):
     menu_options = ('t', 'c', 'x')
@@ -30,6 +30,7 @@ def menu(database: pd.DataFrame):
             print("\nOPTION NOT AVAILABLE")
 
 def main():
+    print("\nLoading...\n")
     database = PropertyDatabase()
     menu(database)
 
