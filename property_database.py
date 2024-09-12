@@ -2,6 +2,7 @@
 import pandas as pd
 import sys
 from tabulate import tabulate
+import textwrap
 
 class PropertyDatabase:
     # Constants
@@ -13,6 +14,9 @@ class PropertyDatabase:
         self.owners = PropertyDatabase.OWNERS
         self.titles = PropertyDatabase.TITLES
         self.titles_owners = PropertyDatabase.TITLES_OWNERS
+
+    def wrap_text(text, width=30):
+        return "\n".join(textwrap.wrap(text, width))
 
     def title_search(self, title_number=None):
         if title_number is None:
@@ -118,7 +122,7 @@ class PropertyDatabase:
                 return f"GBP {price:,.0f}" if not pd.isna(price) else "No data"
 
             def get_address(address: str) -> str:
-                return address.upper() if not pd.isna(address) else "No data"
+                return wrap_text(address.upper(), width=30) if not pd.isna(address) else "No data"
 
             for title in raw:
                 title["ADDRESS"] = get_address(title["ADDRESS"])
