@@ -1,5 +1,5 @@
 # UK Land Registry CCOD and OCOD Database
-Version: 1.0.1
+Version: 1.0.0
 
 This project builds a database for searching the CCOD and OCOD datasets released by the [UK Land Registry](https://use-land-property-data.service.gov.uk/).
 
