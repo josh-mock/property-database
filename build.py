@@ -5,12 +5,13 @@ from zipfile import ZipFile
 import os
 import pandas as pd
 import re
+import maskpass
 
 def get_valid_api_key():
     api_key_pattern = re.compile(r"^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$")
 
     while True:
-        api_key = input("ENTER YOUR API KEY: ")
+        api_key = maskpass.askpass(prompt="INPUT YOUR API KEY: ", mask="*")
 
         if api_key_pattern.match(api_key):
             return api_key
