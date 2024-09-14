@@ -3,4 +3,3 @@ tabulate
 requests
 pyarrow
 maskpass
-fpdf
