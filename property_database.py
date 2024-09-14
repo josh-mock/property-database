@@ -18,8 +18,6 @@ class PropertyDatabase:
         self.titles = PropertyDatabase.TITLES
         self.titles_owners = PropertyDatabase.TITLES_OWNERS
 
-
-
     def title_search(self, title_number=None):
         if title_number is None:
             title_number = input("ENTER TITLE NUMBER: ").upper()
@@ -76,15 +74,15 @@ class PropertyDatabase:
                 owners_list.append([name, country])
             table = owners_list
             headers = ["OWNER", "COUNTRY OF INCORPORATION"]
-            print(tabulate(table, headers=headers, tablefmt="grid"))
+            print(tabulate(table, headers=headers, tablefmt="simple_grid"))
 
         print(f"\n~SEARCH RESULTS FOR TITLE NUMBER {title_number}~\n")
         result = get_title_data()
         format_title_data_output(result, title_number)
-        print(f"\n TITLE NUMBER {title_number} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:\n")
+        print(f"\nTITLE NUMBER {title_number} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:\n")
         format_owner_data_output(result)
-        print(f"\n THE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
-        print("******")
+        print(f"\nTHE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
+        sys.stdout = open('output.txt', 'w')
 
     def company_search(self, company=None):
         if company is None:
@@ -131,7 +129,7 @@ class PropertyDatabase:
                 title["ADDRESS"] = get_address(title["ADDRESS"])
                 title["PRICE"] = get_price(title["PRICE"])
 
-            return tabulate(raw, headers="keys", tablefmt="grid", showindex=False)
+            return tabulate(raw, headers="keys", tablefmt="simple_grid", showindex=False)
 
         owner_data = get_company_data()
         country = get_owner_country(owner_data)
