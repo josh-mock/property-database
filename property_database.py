@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 from tabulate import tabulate
 import textwrap
+from save_to_pdf import save_title_result_to_pdf, save_owner_result_to_pdf
 
 def wrap_text(text, width=30):
     return "\n".join(textwrap.wrap(text, width))
@@ -44,7 +45,8 @@ class PropertyDatabase:
             price = get_price(result)
             table = [[title_number, address, price]]
             headers = ["TITLE NUMBER", "PROPERTY ADDRESS", "PRICE PAID"]
-            print(tabulate(table, headers=headers, tablefmt="grid"))
+            print(tabulate(table, headers=headers, tablefmt="simple_grid"))
+            return (address, price)
 
         def get_owner_data(title_id: int) -> pd.DataFrame:
             owner_data = self.titles_owners[self.titles_owners["title_id"] == title_id]
@@ -75,14 +77,20 @@ class PropertyDatabase:
             table = owners_list
             headers = ["OWNER", "COUNTRY OF INCORPORATION"]
             print(tabulate(table, headers=headers, tablefmt="simple_grid"))
+            return owners_list
 
         print(f"\n~SEARCH RESULTS FOR TITLE NUMBER {title_number}~\n")
         result = get_title_data()
-        format_title_data_output(result, title_number)
+        address, price = format_title_data_output(result, title_number)
         print(f"\nTITLE NUMBER {title_number} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:\n")
-        format_owner_data_output(result)
+        owners_list = format_owner_data_output(result)
+        header = ["OWNER", "COUNTRY OF INCORPORATION"]
+        # Insert the header row at position 0
+        owners_list.insert(0, header)
         print(f"\nTHE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
-        sys.stdout = open('output.txt', 'w')
+        save_title_result_to_pdf(title_number, address, price, owners_list)
+        print("\nSEARCH RESULT SAVED AS PDF.")
+
 
     def company_search(self, company=None):
         if company is None:
@@ -129,18 +137,20 @@ class PropertyDatabase:
                 title["ADDRESS"] = get_address(title["ADDRESS"])
                 title["PRICE"] = get_price(title["PRICE"])
 
-            return tabulate(raw, headers="keys", tablefmt="simple_grid", showindex=False)
+            print(tabulate(raw, headers="keys", tablefmt="simple_grid", showindex=False))
+            return raw
 
         owner_data = get_company_data()
         country = get_owner_country(owner_data)
         owner_id = get_owner_id(owner_data)
         title_ids = get_title_ids(owner_id)
-        table = get_title_information(title_ids)
+
 
         print(f"\n\n~SEARCH RESULTS FOR {company}~\n")
         print(f"\n{company} IS INCORPORATED IN {country}\n")
         print("\nTHE COMPANY OWNS THE FOLLOWING PROPERTIES:\n")
-        print(table)
-        print()
+        title_information = get_title_information(title_ids)
+        save_owner_result_to_pdf(company, country, title_information)
+        print("\nSEARCH RESULT SAVED AS PDF.")
 if __name__ == "__main__":
     db = PropertyDatabase()
