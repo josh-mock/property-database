@@ -5,32 +5,20 @@ This project builds a database for searching the CCOD and OCOD datasets released
 
 ## Installation
 
-Follow these steps to install the project:
-
-1. Clone the repository:
+Install using pip:
    ```bash
-   git clone https://github.com/jwmock88/property-database.git
+   pip install https://github.com/jwmock88/property-database/archive/refs/tags/v1.0.0.tar.gz
    ```
-
-2. Navigate into the project directory:
-    ```bash
-    cd property-database
-    ```
-3. Install the depndencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
 ## Usage
 The project is designed for use with two connected scripts.
 
 ### `build.py`
-`build.py` is used to construct the database. The user is asked to input the year and month in which the datasets they wish to search were published. The user then needs to provide a valid API key for the OCOD and CCOD datasets which can be obtained [here](https://use-land-property-data.service.gov.uk/datasets/ocod#access) subject to the UK Land Registry's license.
+`build.py` is used to construct the database. The user enters `build` into the terminal to run. The user is asked to input the year and month in which the datasets they wish to search were published. The user then needs to provide a valid API key for the OCOD and CCOD datasets which can be obtained [here](https://use-land-property-data.service.gov.uk/datasets/ocod#access) subject to the UK Land Registry's license.
 
 The database is then constructed by loading the csv files obtained from the API call into `Pandas.DataFrame()`, splitting the data into titles, owners, and titles owners tables, and saving the tables as parquet files in a `/data` directory.
 
 ### `search.py`
-`search.py` creates an instance of the `PropertyDatabase` using `property_database.py`. The `PropertyDatabase` currently supports two search functions.
+`search.py` creates an instance of the `PropertyDatabase` using `property_database.py`. The `PropertyDatabase` currently supports two search functions. The user enters `search` into the terminal to search. 
 #### `title_search`
 The user enters a title number via `input`. The function then searches the `PropertyDatabase` for records and returns the following information in two tables:
 
@@ -42,6 +30,8 @@ The user enters a title number via `input`. The function then searches the `Prop
 
 Note that titles may have owners which are not covered in the scopes of the OCOD and CCOD datasets.
 
+The search result is saved in a folder called "results" in PDF format. 
+
 #### `company_search`
 The user enters a company name via `input()`. The function then searches the `PropertyDatabase` for records and returns the following information:
 
@@ -49,6 +39,8 @@ The user enters a company name via `input()`. The function then searches the `Pr
 - Title numbers owned by the company
 - Addresses associated with each title number
 - The price last paid to acquire the property associated with that title number
+
+The search result is saved in a folder called "results" in PDF format. 
 
 ## Future improvements
 - **Chunking**: `build.py` is memory intensive in the loading and saving to parquet sections. Chunking would reduce memory usage in the process.
