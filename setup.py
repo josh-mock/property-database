@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='property_project',
     version='0.1.0',  # Replace with the actual version if not importing
-    py_modules=['build', 'search'],
+    py_modules=['build', 'search', 'property_database'],
     entry_points={
         'console_scripts': [
             'build=build:main',
