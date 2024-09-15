@@ -1,9 +1,9 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='property_project',
-    version='1.0.0',
-    packages=find_packages(),  # Automatically find packages in the current directory
+    version='0.1.0',  # Replace with the actual version if not importing
+    py_modules=['build', 'search'],
     entry_points={
         'console_scripts': [
             'build=build:main',
