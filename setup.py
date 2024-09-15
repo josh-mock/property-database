@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from scripts.__version__ import __version__
+from __version__ import __version__
 
 def read_requirements(filename):
     """Read requirements from a file"""
@@ -17,7 +17,7 @@ setup(
             'search=scripts.search:main',  # Adjust if main() is defined in search.py
         ],
     },
-    install_requires=read_requirements('requirements.txt'),  # Read requirements from the file
+    install_requires=['pandas', 'tabulate', 'requests', 'pyarrow', 'maskpass', 'fpdf2'],
 
     author='Josh Mock',
     description='This project builds a database for searching the CCOD and OCOD datasets released by the UK Land Registry (https://use-land-property-data.service.gov.uk/).',
