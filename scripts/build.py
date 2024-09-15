@@ -249,6 +249,8 @@ def main():
     print("Creating database table: titles_owners...")
     titles_owners = create_titles_owners_table(combined_data, titles, owners)
 
+    if not os.path.exists('data'):
+        os.makedirs('data')
     print("Saving database tables as parquet files...")
     save_to_parquet(titles, r"data/titles.parquet")
     save_to_parquet(owners, r"data/owners.parquet")

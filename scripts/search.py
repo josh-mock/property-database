@@ -1,4 +1,4 @@
-from property_database import PropertyDatabase
+from scripts.property_database import PropertyDatabase
 
 def menu(database: PropertyDatabase):
     menu_options = ('t', 'c', 'x')

@@ -3,7 +3,7 @@ import pandas as pd
 import sys
 from tabulate import tabulate
 import textwrap
-from save_to_pdf import save_title_result_to_pdf, save_owner_result_to_pdf
+from scripts.save_to_pdf import save_title_result_to_pdf, save_owner_result_to_pdf
 
 def wrap_text(text, width=30):
     return "\n".join(textwrap.wrap(text, width))
