@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='property_project',
-    version='0.1.0',  # Replace with the actual version if not importing
+    version=1.0.0
     py_modules=['build', 'search', 'property_database', 'save_to_pdf'],
     entry_points={
         'console_scripts': [
