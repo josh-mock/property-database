@@ -1,9 +1,11 @@
 # COPYRIGHT (C) 2024 JOSHUA MOCK MIT LICENSE
 import pandas as pd
 import sys
-from tabulate import tabulate
+import os
 import textwrap
+from tabulate import tabulate
 from save_to_pdf import save_title_result_to_pdf, save_owner_result_to_pdf
+from datetime import datetime
 
 def wrap_text(text, width=30):
     return "\n".join(textwrap.wrap(text, width))
@@ -19,6 +21,36 @@ class PropertyDatabase:
         self.titles = PropertyDatabase.TITLES
         self.titles_owners = PropertyDatabase.TITLES_OWNERS
 
+    def fuzzy_company_search(self, company=None, jurisdiction=None):
+        def format_search_results(search_results: pd.Dataframe):
+            filtered = search_results[["owner", "country"]]
+            print(f"\n{len(filtered)} results containing {company}")
+            results = filtered.to_dict(orient='records')
+            if not os.path.exists('fuzzy_results'):
+                os.makedirs('fuzzy_results')
+            with open(fr'fuzzy_results/{datetime.now().strftime('%y%m%d')}_{company}.txt', 'w') as file:
+                for result in results:
+                    file.write(f"{result["owner"]} ({result["country"]})")
+                    file.write("\n")
+            return 
+
+
+        if company is None:
+            company = input("ENTER PART OF COMPANY NAME: ").upper()
+        if jurisdiction is None:
+            jurisdiction = input("ENTER JURISDICTION (OPTIONAL; ONLY FOR NON-UK COMPANIES). ENTER 'NONE' IF YOU WISH TO SKIP: ").upper()
+            if jurisdiction == "NONE":
+                jurisdiction = None
+        
+        if company and not jurisdiction:
+            search_results = self.owners[self.owners["owner"].str.contains(company)]
+            format_search_results(search_results)
+
+        
+        elif company and jurisdiction:
+            search_results = self.owners[self.owners["owner"].str.contains(company) & self.owners["country"].str.contains(jurisdiction)]
+            format_search_results(search_results)
+            
     def title_search(self, title_number=None):
         if title_number is None:
             title_number = input("ENTER TITLE NUMBER: ").upper()
