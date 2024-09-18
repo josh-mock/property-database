@@ -15,11 +15,13 @@ def menu(database: PropertyDatabase):
 
         if user_input in menu_options:
             if user_input == "t":
-                result = database.perform_title_search()
+                title_number = input("ENTER TITLE NUMBER: ").upper()
+                result = database.perform_title_search(title_number)
                 print_title_search_result(result)
 
             elif user_input == "c":
-                result = database.perform_company_search()
+                company = input("ENTER COMPANY NAME: ").upper()
+                result = database.perform_company_search(company)
                 print_company_search_result(result)
 
             elif user_input == "x":
@@ -29,9 +31,9 @@ def menu(database: PropertyDatabase):
         else:
             print("\nOPTION NOT AVAILABLE")
 
-def print_title_search_result(result):
+def print_title_search_result(title_number, result):
     if result == 0:
-        print("\nNo results.")
+        print(f"\nNo results for title_number '{title_number}'.")
     else:
         print(f"\nSEARCH RESULTS FOR TITLE NUMBER {result["TITLE_NUMBER"]}\n")
         print(tabulate([["TITLE NUMBER","ADDRESS","PRICE LAST PAID"],[result["TITLE_NUMBER"], "\n".join(textwrap.wrap(result['ADDRESS'], width=60)), result['PRICE']]], headers="firstrow", tablefmt="simple_grid"))
@@ -39,9 +41,9 @@ def print_title_search_result(result):
         print(tabulate(result['OWNERS'], headers="keys", tablefmt="simple_grid"))
         print(f"\nTHE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
 
-def print_company_search_result(result):
+def print_company_search_result(company, result):
     if result == 0:
-        print("\nNo results.")
+        print(f"\nNo results for company {company}.")
 
     else:
         print(f"\nSEARCH RESULTS FOR COMPANY {result['COMPANY']}\n")

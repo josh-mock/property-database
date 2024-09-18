@@ -12,10 +12,7 @@ class PropertyDatabase:
         self.titles = PropertyDatabase.titles
         self.titles_owners = PropertyDatabase.titles_owners
 
-    def perform_title_search(self, title_number=None) -> dict:
-        if title_number is None:
-            title_number = input("ENTER TITLE_NUMBER: ").upper()
-
+    def perform_title_search(self, title_number) -> dict:
         try:
             titles_owners_joined = pd.merge(self.titles, self.titles_owners, on='title_id')
             final_df = pd.merge(titles_owners_joined, self.owners, on='owner_id')
@@ -34,9 +31,7 @@ class PropertyDatabase:
             return result
 
 
-    def perform_company_search(self, company=None) -> dict:
-        if company is None:
-            company = input("ENTER COMPANY NAME: ").upper()
+    def perform_company_search(self, company) -> dict:
         try:
             titles_owners_joined = pd.merge(self.titles, self.titles_owners, on='title_id')
             final_df = pd.merge(titles_owners_joined, self.owners, on='owner_id')
