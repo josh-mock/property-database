@@ -30,8 +30,9 @@ class PropertyDatabase:
             return result
 
         except IndexError:
-            print(f"\nNo results for title number '{title_number}'\n")
-            return
+            result = 0
+            return result
+
 
     def perform_company_search(self, company=None) -> dict:
         if company is None:
@@ -54,8 +55,8 @@ class PropertyDatabase:
             return result
 
         except IndexError:
-            print(f"\nNo results for company '{company}'\n")
-            return
+            result = 0
+            return result
 
 if __name__ == "__main__":
     db = PropertyDatabase()
