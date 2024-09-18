@@ -1,4 +1,6 @@
 from property_database import PropertyDatabase
+from tabulate import tabulate
+import textwrap
 
 def menu(database: PropertyDatabase):
     menu_options = ('t', 'c', 'x')
@@ -13,10 +15,18 @@ def menu(database: PropertyDatabase):
 
         if user_input in menu_options:
             if user_input == "t":
-                database.title_search()
+                try:
+                    result = database.perform_title_search()
+                    print_title_search_result(result)
+                except TypeError:
+                    pass
 
             elif user_input == "c":
-                database.company_search()
+                try:
+                    result = database.perform_company_search()
+                    print_company_search_result(result)
+                except TypeError:
+                    pass
 
             elif user_input == "x":
                 print("Bye!")
@@ -24,6 +34,20 @@ def menu(database: PropertyDatabase):
 
         else:
             print("\nOPTION NOT AVAILABLE")
+
+def print_title_search_result(result: dict):
+    print(f"\nSEARCH RESULTS FOR TITLE NUMBER {result["TITLE_NUMBER"]}\n")
+    print(tabulate([["TITLE NUMBER","ADDRESS","PRICE LAST PAID"],[result["TITLE_NUMBER"], "\n".join(textwrap.wrap(result['ADDRESS'], width=60)), result['PRICE']]], headers="firstrow", tablefmt="simple_grid"))
+    print(f"\nTITLE NUMBER {result["TITLE_NUMBER"]} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:\n")
+    print(tabulate(result['OWNERS'], headers="keys", tablefmt="simple_grid"))
+    print(f"\nTHE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
+
+def print_company_search_result(result: dict):
+    print(f"\nSEARCH RESULTS FOR COMPANY {result["COMPANY"]}\n")
+    print(f"\n{result["COMPANY"]} IS INCORPORATED IN {result["COUNTRY"]}\n")
+    print("\nTHE COMPANY OWNS THE FOLLOWING PROPERTIES:\n")
+    print(tabulate(result['PROPERTIES'], headers="keys", tablefmt="simple_grid"))
+
 
 def main():
     menu(PropertyDatabase())

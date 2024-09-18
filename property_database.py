@@ -5,7 +5,7 @@ class PropertyDatabase:
     # Tables
     owners = pd.read_parquet(r"data/owners.parquet")
     titles = pd.read_parquet(r"data/titles.parquet")
-    title_owners = pd.read_parquet(r"data/titles_owners.parquet")
+    titles_owners = pd.read_parquet(r"data/titles_owners.parquet")
 
     def __init__(self):
         self.owners = PropertyDatabase.owners
@@ -30,7 +30,7 @@ class PropertyDatabase:
             return result
 
         except IndexError:
-            print(f"No results for title number '{title_number}'")
+            print(f"\nNo results for title number '{title_number}'\n")
             return
 
     def perform_company_search(self, company=None) -> dict:
@@ -42,19 +42,19 @@ class PropertyDatabase:
             filtered_df = final_df[final_df['owner'] == company]
 
             result = {
-                'owner': company,
-                'country': filtered_df['country'].iloc[0],
-                'properties': filtered_df.apply(lambda row: {
-                    'title_number': row['title_number'],
-                    'address': row['address'],
-                    'price': row['price']
+                'COMPANY': company,
+                'COUNTRY': filtered_df['country'].iloc[0],
+                'PROPERTIES': filtered_df.apply(lambda row: {
+                    'TITLE NUMBER': row['title_number'],
+                    'ADDRESS': row['address'],
+                    'PRICE LAST PAID': row['price']
                 }, axis=1).tolist()
             }
 
             return result
 
         except IndexError:
-            print(f"No results for company '{company}'")
+            print(f"\nNo results for company '{company}'\n")
             return
 
 if __name__ == "__main__":
