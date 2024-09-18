@@ -1,14 +1,12 @@
 # UK Land Registry CCOD and OCOD Database
-Version: 1.0.0
+Version: 1.1.0
 
 This project builds a database for searching the CCOD and OCOD datasets released by the [UK Land Registry](https://use-land-property-data.service.gov.uk/).
 
 ## Installation
 
-Install using pip:
-   ```bash
-   pip install https://github.com/jwmock88/property-database/archive/refs/tags/v1.0.0.tar.gz
-   ```
+Install by downloading from the repository into your selected folder. 
+
 ## Usage
 The project is designed for use with two connected scripts.
 
@@ -42,12 +40,18 @@ The user enters a company name via `input()`. The function then searches the `Pr
 
 The search result is saved in a folder called "results" in PDF format. 
 
+#### `fuzzy_search`
+Used for finding a company's name as recorded in the dataset. This is currently only available for companies not incorporated in the UK.
+
+The user enters a search term when prompted. Optionally, the user can then add a jurisdiction. These are currently not standardised and are based on how the jurisdictions are written in the dataset. A future version of the project will standardise the jurisdictions
+
+
 ## Future improvements
 - **Chunking**: `build.py` is memory intensive in the loading and saving to parquet sections. Chunking would reduce memory usage in the process.
-- **Fuzzy search**: The dataset contains errors including misspelled company names. Users currently have to enter the company name exactly as it is in the database to use `company_search()`. A fuzzy search function would allow users more flexibility when searching by company name.
 - **Export ability**: Users will be able to export search results in a variety of file formats.
 - **Graphical User Interface**: Creating  a GUI will make the search function more user friendly.
 - **More data sets**: The project currently supports searching data from one month. OCOD and CCOD data is available dating back to 2015, and future versions of the project will allow a user to search historical records for companies and titles.
+- **Bulk search**: You will be able to have a list of companeis and search in buulk. 
 
 ## License
 
