@@ -5,7 +5,8 @@ This project builds a database for searching the CCOD and OCOD datasets released
 
 ## Installation
 
-Install by downloading from the repository into your selected folder. 
+Install by downloading from the repository into your selected folder. Then run the following code:
+```pip install -r requirements.txt```
 
 ## Usage
 The project is designed for use with two connected scripts.
