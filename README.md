@@ -26,7 +26,7 @@ This script automates the process of downloading and transforming land property 
 
 ### Usage
 
-- Run the script using ```python build.py`` You will be prompted for:
+- Run the script using `python build.py`. You will be prompted for:
   - An API key (which should follow the format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).
   - The year (YYYY) and month (MM) for the dataset you want to process.
 
@@ -37,46 +37,59 @@ This script automates the process of downloading and transforming land property 
    - Clean up intermediate CSV files.
 
 ### Output
-The script produces three parquet files: 
-1. data/titles.parquet: Contains unique property titles with price and address.
-2. data/owners.parquet: Contains owner information, including country of incorporation.
-3. data/titles_owners.parquet: Contains the relationship between titles and owners.
+The script produces three parquet files:
+1. **`data/titles.parquet`**: Contains unique property titles with price and address.
+2. **`data/owners.parquet`**: Contains owner information, including country of incorporation.
+3. **`data/titles_owners.parquet`**: Contains the relationship between titles and owners.
 
 ### Error Handling
 1. **Invalid API Key**: The script checks if the API key matches the expected UUID pattern. If not, it will ask you to re-enter a valid key.
 2. **Invalid Month/Year Input**: If the month or year input is invalid, the script prompts for a correct value.
 3. **File Not Found**: If the downloaded CSV files are missing or the provided path is incorrect, the script raises a FileNotFoundError.
 
+## Class: PropertyDatabase
+### Methods
+#### `perform_title_search(title_number: str) -> dict`
+Performs a search for a property using the given title number and returns relevant details.
 
-### `search.py`
-`search.py` creates an instance of the `PropertyDatabase` using `property_database.py`. The `PropertyDatabase` currently supports two search functions. The user enters `search` into the terminal to search. 
-#### `title_search`
-The user enters a title number via `input`. The function then searches the `PropertyDatabase` for records and returns the following information in two tables:
+#### Parameters:
+- **title_number (string)**: The title number of the property.
 
-- Title Number
-- Address associated with that title number
-- The price last paid to acquire the property associated with that title number
-- The names of UK companies ('UK company' as defined by the [UK Land Registry](https://use-land-property-data.service.gov.uk/datasets/ccod/tech-spec)) which own the property
-- The names of overseas comapnies ('overseas company' as defined by the [UK Land Registry](https://use-land-property-data.service.gov.uk/datasets/ocod/tech-spec)) which own the property
+  Returns a dictionary containing:
+  - **TITLE_NUMBER**: The title number.
+  - **ADDRESS**: The property address.
+  - **PRICE**: Price last paid.
+  - **OWNERS**: A list of owners, each with:
+    - **OWNER**: Owner's name.
+    - **COUNTRY**: Country of incorporation (if applicable).
+    - **SOURCE**: Data source.
 
-Note that titles may have owners which are not covered in the scopes of the OCOD and CCOD datasets.
+  If the title number is not found, the method returns 0.
 
-The search result is saved in a folder called "results" in PDF format. 
+#### `perform_company_search(company: str) -> dict`
+Searches for all properties owned by a specific company.
 
-#### `company_search`
-The user enters a company name via `input()`. The function then searches the `PropertyDatabase` for records and returns the following information:
+#### Parameters:
+- **company (string)**: The company name.
 
-- The company's country/jurisdiction of incorporation
-- Title numbers owned by the company
-- Addresses associated with each title number
-- The price last paid to acquire the property associated with that title number
+  Returns a dictionary containing:
+    - **COMPANY**: The name of the company.
+    - **COUNTRY**: The country of incorporation (if applicable).
+    - **SOURCE**: Data source.
+    - **PROPERTIES**: A list of properties owned by the company, each with:
+    - **TITLE NUMBER**: The title number.
+    - **ADDRESS**: The property address.
+    - **PRICE LAST PAID**: The price of the property.
 
-The search result is saved in a folder called "results" in PDF format. 
+  If the company is not found, the method returns 0.
 
-#### `fuzzy_search`
-Used for finding a company's name as recorded in the dataset. This is currently only available for companies not incorporated in the UK.
+#### `perform_fuzzy_search(search_term: str) -> list`
+Performs a fuzzy search on the owners dataset, returning partial matches to the provided search term.
 
-The user enters a search term when prompted. Optionally, the user can then add a jurisdiction. These are currently not standardised and are based on how the jurisdictions are written in the dataset. A future version of the project will standardise the jurisdictions
+#### Parameters:
+- **search_term (string)**: The term to search for within the owners' names.
+
+  Returns a list of matching owners.
 
 ## License
 
