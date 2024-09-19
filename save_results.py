@@ -66,8 +66,10 @@ def save_title_result_to_pdf(clean_result, project_name):
 
     pdf.output(filename)
 
-def save_owner_result_to_pdf(company, country, title_information):
+def save_company_result_to_pdf(clean_result, project_name):
     pdf = FPDF()
+    company = clean_result['COMPANY']
+    country = clean_result['COUNTRY']
     pdf.add_page()
     # Title of the PDF
 
@@ -82,29 +84,31 @@ def save_owner_result_to_pdf(company, country, title_information):
     pdf.ln()
 
     pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(w=0, h=10, text=f'{company} INCORPORATED IN {country} OWNS THE FOLLOWING PROPERTY/PROPERTIES:', border=0, align='C')
+    if country != 'NO DATA':
+        pdf.multi_cell(w=0, h=10, text=f'{company} INCORPORATED IN {country} OWNS THE FOLLOWING PROPERTY/PROPERTIES:', border=0, align='C')
+    else:
+        pdf.multi_cell(w=0, h=10, text=f'{company} OWNS THE FOLLOWING PROPERTY/PROPERTIES:', border=0, align='C')
 
     pdf.set_font("Helvetica", "", size=8)
 
-    table_data = []
-    header = list(title_information[0].keys())
-    table_data.append(header)
-
-    for i in range(len(title_information)):
-        c = list(title_information[i].values())
-        table_data.append(c)
-
     with pdf.table(text_align="CENTER") as table:
-        for data_row in table_data:
-            row = table.row()
-            for datum in data_row:
-                row.cell(datum)
+        # Add headers to the table for owner data
+        headers = ['TITLE NUMBER', 'ADDRESS', 'PRICE LAST PAID']
+        header_row = table.row()
+        for header in headers:
+            header_row.cell(header)
 
-    if not os.path.exists('results'):
-        os.makedirs('results')
+        # Add the owner data rows
+        for property in clean_result['PROPERTIES']:
+            owner_row = table.row()
+            owner_row.cell(property['TITLE NUMBER'])
+            owner_row.cell(property['ADDRESS'])
+            owner_row.cell(property['PRICE LAST PAID'])
 
-    # Define the filename with the folder path
-    filename = os.path.join('results', f"{datetime.now().strftime('%y%m%d')}_{company}.pdf")
 
-    # Save the PDF to the specified path
+    if not os.path.exists(rf'results/{project_name}'):
+        os.makedirs(f'results/{project_name}')
+
+    filename = os.path.join(fr'results/{project_name}', f"{company}.pdf")
+
     pdf.output(filename)

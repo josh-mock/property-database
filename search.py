@@ -1,14 +1,14 @@
 from property_database import PropertyDatabase
-from save_results import save_title_result_to_pdf
+from save_results import save_title_result_to_pdf, save_company_result_to_pdf
 from tabulate import tabulate
 import numpy as np
 import textwrap
 
 def menu(database: PropertyDatabase):
     menu_options = ('t', 'c', 'x')
+    project_name = input("\nENTER PROJECT NAME: ").lower()
 
     while True:
-        project_name = input("\nENTER PROJECT NAME: ").lower()
         print("\n** MENU **")
         print("t = search by title number")
         print("c = search by company name")
@@ -36,6 +36,7 @@ def menu(database: PropertyDatabase):
                 else:
                     clean_result = clean_company_search_result(result)
                     print_company_search_result(result)
+                    save_company_result_to_pdf(clean_result, project_name)
 
             elif user_input == "x":
                 print("Bye!")
