@@ -97,8 +97,7 @@ def create_titles_table(df: pd.DataFrame) -> pd.DataFrame:
     """Create the 'Titles' table with unique IDs and clean text data."""
 
     # Select the relevant columns and create a copy
-    titles = df[["Title Number", "Property Address",
-                 "Price Paid", "source"]].copy()
+    titles = df[["Title Number", "Property Address", "Price Paid"]].copy()
 
     # Add unique ID for each title
     titles["title_id"] = range(1, len(titles) + 1)
