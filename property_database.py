@@ -53,5 +53,12 @@ class PropertyDatabase:
             result = 0
             return result
 
+
+    def perform_fuzzy_search(self, search_term):
+        search_results = self.owners[self.owners["owner"].str.contains(search_term)]
+        return search_results["owner"].tolist()
+
+
+
 if __name__ == "__main__":
     db = PropertyDatabase()

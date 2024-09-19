@@ -1,42 +1,31 @@
 from property_database import PropertyDatabase
-from save_results import save_title_result_to_pdf, save_company_result_to_pdf
+from save_results import save_title_result_to_pdf, save_company_result_to_pdf, save_fuzzy_result_to_txt
 from tabulate import tabulate
 import numpy as np
 import textwrap
 
 def menu(database: PropertyDatabase):
-    menu_options = ('t', 'c', 'x')
+    menu_options = ('t', 'c', 'x', 'f')
     project_name = input("\nENTER PROJECT NAME: ").lower()
 
     while True:
         print("\n** MENU **")
         print("t = search by title number")
         print("c = search by company name")
+        print("f = search for company names (fuzzy search)")
         print("x = exit")
 
         user_input = input("Enter an option: ").lower()
 
         if user_input in menu_options:
             if user_input == "t":
-                title_number = input("ENTER TITLE NUMBER: ").upper()
-                result = database.perform_title_search(title_number)
-                if result != 0:
-                    clean_result = clean_title_search_result(result)
-                    print_title_search_result(clean_result)
-                    save_title_result_to_pdf(clean_result, project_name)
-                    print("\nRESULT SAVED AS A PDF.\n")
-                else:
-                    print(f"\nNo results for title_number '{title_number}'.")
+                title_search(database, project_name, title_number=None)
 
             elif user_input == "c":
-                company = input("ENTER COMPANY NAME: ").upper()
-                result = database.perform_company_search(company)
-                if result == 0:
-                    print(f"\nNo results for company {company}.")
-                else:
-                    clean_result = clean_company_search_result(result)
-                    print_company_search_result(result)
-                    save_company_result_to_pdf(clean_result, project_name)
+                company_search(database, project_name, company=None)
+
+            elif user_input == "f":
+                fuzzy_search(database, project_name, search_term=None)
 
             elif user_input == "x":
                 print("Bye!")
@@ -44,6 +33,45 @@ def menu(database: PropertyDatabase):
 
         else:
             print("\nOPTION NOT AVAILABLE")
+
+
+def title_search(database, project_name, title_number=None):
+    if title_number is None:
+        title_number = input("ENTER TITLE NUMBER: ").upper()
+
+    result = database.perform_title_search(title_number)
+    if result != 0:
+        clean_result = clean_title_search_result(result)
+        print_title_search_result(clean_result)
+        save_title_result_to_pdf(clean_result, project_name)
+        print("\nRESULT SAVED AS A PDF.\n")
+    else:
+        print(f"\nNo results for title_number '{title_number}'.")
+
+
+def company_search(database, project_name, company=None):
+    if company is None:
+        company = input("ENTER COMPANY NAME: ").upper()
+
+    result = database.perform_company_search(company)
+    if result == 0:
+        print(f"\nNo results for company {company}.")
+    else:
+        clean_result = clean_company_search_result(result)
+        print_company_search_result(result)
+        save_company_result_to_pdf(clean_result, project_name)
+
+def fuzzy_search(database, project_name, search_term=None):
+    if search_term is None:
+        search_term = input("ENTER SEARCH TERM: ").upper()
+
+    results = database.perform_fuzzy_search(search_term)
+    if len(results) == 0:
+        print(f"No results for company names containing search term '{search_term}'.")
+
+    else:
+        print(f"{len(results)} results for company names containing search term '{search_term}'.")
+        save_fuzzy_result_to_txt(project_name, search_term, results)
 
 
 def print_title_search_result(clean_result):

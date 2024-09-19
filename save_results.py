@@ -62,7 +62,7 @@ def save_title_result_to_pdf(clean_result, project_name):
     if not os.path.exists(rf'results/{project_name}'):
         os.makedirs(f'results/{project_name}')
 
-    filename = os.path.join(fr'results/{project_name}', f"{title_number}.pdf")
+    filename = os.path.join(fr'results/{project_name}', f"title_{title_number}.pdf")
 
     pdf.output(filename)
 
@@ -109,6 +109,16 @@ def save_company_result_to_pdf(clean_result, project_name):
     if not os.path.exists(rf'results/{project_name}'):
         os.makedirs(f'results/{project_name}')
 
-    filename = os.path.join(fr'results/{project_name}', f"{company}.pdf")
+    filename = os.path.join(fr'results/{project_name}', f"company_{company}.pdf")
 
     pdf.output(filename)
+
+def save_fuzzy_result_to_txt(project_name, search_term, results):
+    if not os.path.exists(rf'results/{project_name}'):
+        os.makedirs(f'results/{project_name}')
+
+    filename = os.path.join(fr'results/{project_name}', f"fuzzy_{search_term}.txt")
+
+    with open(filename, 'w') as file:
+        for result in results:
+            file.write(f"{result}\n")
