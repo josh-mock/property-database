@@ -2,8 +2,11 @@ import os
 from fpdf import FPDF
 from datetime import datetime
 
-def save_title_result_to_pdf(title_number, address, price, owners_list):
+def save_title_result_to_pdf(clean_result, project_name):
     pdf = FPDF()
+    title_number = clean_result['TITLE_NUMBER']
+    address = clean_result['ADDRESS']
+    price = clean_result['PRICE']
     pdf.add_page()
     # Title of the PDF
 
@@ -18,7 +21,7 @@ def save_title_result_to_pdf(title_number, address, price, owners_list):
     pdf.ln()
 
 
-    table_data = (
+    title_table_data = (
         ("TITLE NUMBER", "ADDRESS", "PRICE LAST PAID"),
         (title_number, address, price)
     )
@@ -26,7 +29,7 @@ def save_title_result_to_pdf(title_number, address, price, owners_list):
     pdf.set_font("Helvetica", "", size=8)
 
     with pdf.table(text_align="CENTER") as table:
-        for data_row in table_data:
+        for data_row in title_table_data:
             row = table.row()
             for datum in data_row:
                 row.cell(datum)
@@ -40,19 +43,26 @@ def save_title_result_to_pdf(title_number, address, price, owners_list):
     pdf.set_font("Helvetica", "", size=8)
 
     with pdf.table(text_align="CENTER") as table:
-        for data_row in owners_list:
-            row = table.row()
-            for datum in data_row:
-                row.cell(datum)
+        # Add headers to the table for owner data
+        headers = ['OWNER', 'COUNTRY']
+        header_row = table.row()
+        for header in headers:
+            header_row.cell(header)
+
+        # Add the owner data rows
+        for owner in clean_result['OWNERS']:
+            owner_row = table.row()
+            owner_row.cell(owner['OWNER'])
+            owner_row.cell(owner['COUNTRY'])
 
     pdf.ln()
     pdf.set_font("Helvetica", "", size=10)
     pdf.multi_cell(w=0, h=10, text=f'THE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES', border=0, align='C')
 
-    if not os.path.exists('results'):
-        os.makedirs('results')
+    if not os.path.exists(rf'results/{project_name}'):
+        os.makedirs(f'results/{project_name}')
 
-    filename = os.path.join('results', f"{datetime.now().strftime('%y%m%d')}_{title_number}.pdf")
+    filename = os.path.join(fr'results/{project_name}', f"{title_number}.pdf")
 
     pdf.output(filename)
 

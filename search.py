@@ -1,4 +1,5 @@
 from property_database import PropertyDatabase
+from save_results import save_title_result_to_pdf
 from tabulate import tabulate
 import numpy as np
 import textwrap
@@ -7,6 +8,7 @@ def menu(database: PropertyDatabase):
     menu_options = ('t', 'c', 'x')
 
     while True:
+        project_name = input("\nENTER PROJECT NAME: ").lower()
         print("\n** MENU **")
         print("t = search by title number")
         print("c = search by company name")
@@ -18,12 +20,22 @@ def menu(database: PropertyDatabase):
             if user_input == "t":
                 title_number = input("ENTER TITLE NUMBER: ").upper()
                 result = database.perform_title_search(title_number)
-                print_title_search_result(title_number, result)
+                if result != 0:
+                    clean_result = clean_title_search_result(result)
+                    print_title_search_result(clean_result)
+                    save_title_result_to_pdf(clean_result, project_name)
+                    print("\nRESULT SAVED AS A PDF.\n")
+                else:
+                    print(f"\nNo results for title_number '{title_number}'.")
 
             elif user_input == "c":
                 company = input("ENTER COMPANY NAME: ").upper()
                 result = database.perform_company_search(company)
-                print_company_search_result(company, result)
+                if result == 0:
+                    print(f"\nNo results for company {company}.")
+                else:
+                    clean_result = clean_company_search_result(result)
+                    print_company_search_result(result)
 
             elif user_input == "x":
                 print("Bye!")
@@ -32,16 +44,14 @@ def menu(database: PropertyDatabase):
         else:
             print("\nOPTION NOT AVAILABLE")
 
-def print_title_search_result(title_number, result):
-    if result == 0:
-        print(f"\nNo results for title_number '{title_number}'.")
-    else:
-        clean_result = clean_title_search_result(result)
-        print(f"\nSEARCH RESULTS FOR TITLE NUMBER {clean_result["TITLE_NUMBER"]}\n")
-        print(tabulate([["TITLE NUMBER","ADDRESS","PRICE LAST PAID"],[clean_result["TITLE_NUMBER"], clean_result["ADDRESS"], clean_result['PRICE']]], headers="firstrow", tablefmt="simple_grid"))
-        print(f"\nTITLE NUMBER {clean_result["TITLE_NUMBER"]} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:\n")
-        print(tabulate(clean_result['OWNERS'], headers="keys", tablefmt="simple_grid"))
-        print(f"\nTHE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
+
+def print_title_search_result(clean_result):
+    print(f"\nSEARCH RESULTS FOR TITLE NUMBER {clean_result["TITLE_NUMBER"]}\n")
+    print(tabulate([["TITLE NUMBER","ADDRESS","PRICE LAST PAID"],[clean_result["TITLE_NUMBER"], clean_result["ADDRESS"], clean_result['PRICE']]], headers="firstrow", tablefmt="simple_grid"))
+    print(f"\nTITLE NUMBER {clean_result["TITLE_NUMBER"]} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:\n")
+    print(tabulate(clean_result['OWNERS'], headers="keys", tablefmt="simple_grid"))
+    print(f"\nTHE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES\n")
+
 
 def clean_title_search_result(result: dict) -> dict:
     # Check if 'PRICE' is NaN and replace with 'No data'
@@ -70,17 +80,13 @@ def clean_title_search_result(result: dict) -> dict:
     return result
 
 
-def print_company_search_result(company, result):
-    if result == 0:
-        print(f"\nNo results for company {company}.")
+def print_company_search_result(cleaned_result):
+    print(f"\nSEARCH RESULTS FOR COMPANY {cleaned_result['COMPANY']}\n")
+    if cleaned_result['COUNTRY'] != "NO DATA":
+        print(f"\n{cleaned_result['COMPANY']} IS INCORPORATED IN {cleaned_result['COUNTRY']}\n")
+    print("\nTHE COMPANY OWNS THE FOLLOWING PROPERTIES:\n")
+    print(tabulate(cleaned_result['PROPERTIES'], headers="keys", tablefmt="simple_grid"))
 
-    else:
-        cleaned_result = clean_company_search_result(result)
-        print(f"\nSEARCH RESULTS FOR COMPANY {cleaned_result['COMPANY']}\n")
-        if cleaned_result['COUNTRY'] != "NO DATA":
-            print(f"\n{cleaned_result['COMPANY']} IS INCORPORATED IN {cleaned_result['COUNTRY']}\n")
-        print("\nTHE COMPANY OWNS THE FOLLOWING PROPERTIES:\n")
-        print(tabulate(cleaned_result['PROPERTIES'], headers="keys", tablefmt="simple_grid"))
 
 def clean_company_search_result(result: dict) -> dict:
     # Format country
@@ -107,6 +113,7 @@ def clean_company_search_result(result: dict) -> dict:
             property['ADDRESS'] = "\n".join(textwrap.wrap(property['ADDRESS'], width=60))
 
     return result
+
 
 def main():
     menu(PropertyDatabase())
