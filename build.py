@@ -82,7 +82,7 @@ def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.Da
     data = pd.read_csv(file_path, encoding="utf-8", usecols=columns, dtype=dtypes)
 
     # Replace NaN values with "NO DATA"
-    data = data.fillna("NO DATA")
+    data = data.apply(lambda col: col.fillna("NO DATA") if col.name != "Price Paid" else col)
 
     filtered_data = data[data["Title Number"] != "Row Count"]
 
@@ -230,8 +230,8 @@ def main():
                             "Country Incorporated (1)", "Country Incorporated (2)", "Country Incorporated (3)", "Country Incorporated (4)"]
     ccod_columns_to_load = ["Title Number", "Property Address", "Price Paid",
                             "Proprietor Name (1)", "Proprietor Name (2)", "Proprietor Name (3)", "Proprietor Name (4)"]
-    dtype_dict = {"Title Number": "string", "Property Address": "string", "Price Paid": "float", "Proprietor Name (1)": "string", "Proprietor Name (2)": "string", "Proprietor Name (3)": "string", "Proprietor Name (4)": "string",
-                  "Country Incorporated (1)": "string", "Country Incorporated (2)": "string", "Country Incorporated (3)": "string", "Country Incorporated (4)": "string"}
+    dtype_dict = {"Title Number": "object", "Property Address": "object", "Price Paid": "float", "Proprietor Name (1)": "object", "Proprietor Name (2)": "object", "Proprietor Name (3)": "object", "Proprietor Name (4)": "object",
+                  "Country Incorporated (1)": "object", "Country Incorporated (2)": "object", "Country Incorporated (3)": "object", "Country Incorporated (4)": "object"}
 
     print("Loading OCOD dataset...")
     ocod_df = load_data("ocod.csv",

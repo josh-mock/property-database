@@ -90,12 +90,8 @@ def clean_title_search_result(result: dict) -> dict:
         # Format PRICE as GBP with thousands separator and no decimal points
         result['PRICE'] = f"GBP {int(result['PRICE']):,}"
 
-    # Check if address is None and replace with 'No data'
-    if result['ADDRESS'] is None:
-        result['ADDRESS'] = 'NO DATA'
-    else:
-        # Wrap text
-        result['ADDRESS'] = "\n".join(textwrap.wrap(result['ADDRESS'], width=60))
+    # Wrap address
+    result['ADDRESS'] = "\n".join(textwrap.wrap(result['ADDRESS'], width=60))
 
     # Format country
     for owner in result['OWNERS']:

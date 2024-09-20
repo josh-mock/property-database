@@ -18,11 +18,16 @@ class PropertyDatabase:
             final_df = pd.merge(titles_owners_joined, self.owners, on='owner_id')
             filtered_df = final_df[final_df['title_number'] == title_number]
 
-            result = {'TITLE_NUMBER': filtered_df['title_number'].iloc[0],
-            'ADDRESS': filtered_df['address'].iloc[0],
-            'PRICE': filtered_df['price'].iloc[0],
-            'OWNERS': filtered_df.apply(lambda row: {'OWNER': row['owner'], 'COUNTRY': row['country'], 'SOURCE': row['source']}, axis=1).tolist()}
-
+            result = {
+                'TITLE_NUMBER': filtered_df['title_number'].iloc[0],
+                'ADDRESS': filtered_df['address'].iloc[0],
+                'PRICE': filtered_df['price'].iloc[0],
+                'OWNERS': filtered_df.apply(lambda row: {
+                    'OWNER': row['owner'],
+                    'COUNTRY': row['country'],
+                    'SOURCE': row['source']
+                }, axis=1).tolist()
+            }
             return result
 
         except IndexError:
@@ -38,14 +43,15 @@ class PropertyDatabase:
 
             result = {
                 'COMPANY': company,
-                'COUNTRY': filtered_df['country'].iloc[0],
-                'SOURCE': filtered_df['source'],
+                'COUNTRY': filtered_df['country'].iloc[0],  # Assuming there's at least one row
+                'SOURCE': filtered_df['source'].iloc[0],     # Get the first value
                 'PROPERTIES': filtered_df.apply(lambda row: {
                     'TITLE NUMBER': row['title_number'],
                     'ADDRESS': row['address'],
                     'PRICE LAST PAID': row['price']
                 }, axis=1).tolist()
             }
+
 
             return result
 
