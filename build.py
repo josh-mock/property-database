@@ -79,8 +79,10 @@ def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.Da
         raise FileNotFoundError(f"The file {file_path} does not exist.")
 
     # Load the CSV file into a DataFrame
-    data = pd.read_csv(file_path, encoding="utf-8",
-                       usecols=columns, dtype=dtypes)
+    data = pd.read_csv(file_path, encoding="utf-8", usecols=columns, dtype=dtypes)
+
+    # Replace NaN values with "NO DATA"
+    data = data.fillna("NO DATA")
 
     filtered_data = data[data["Title Number"] != "Row Count"]
 
