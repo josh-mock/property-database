@@ -215,7 +215,7 @@ def save_to_parquet(df: pd.DataFrame, file_path: str):
     df.to_parquet(file_path, index=False)
 
 
-def main():
+def build():
     # Get csv files from the dataset using the API
     year = get_valid_year()
     month = get_valid_month()
@@ -262,7 +262,3 @@ def main():
     os.remove("ocod.csv")
 
     print("Database built.")
-
-
-if __name__ == "__main__":
-    main()
