@@ -2,8 +2,10 @@ import tkinter as tk
 import datetime
 from tkinter import ttk
 from tkinter import *
-from utils.home import clear_current_window, center_window
-from utils.download_data import download_data
+from HomeUtils import clear_current_window, center_window
+from download_data import download_data
+import sqlite3
+
 
 
 WINDOW_WIDTH = 800
