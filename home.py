@@ -4,8 +4,6 @@ from tkinter import ttk
 from tkinter import *
 from HomeUtils import clear_current_window, center_window
 from download_data import download_data
-import sqlite3
-
 
 
 WINDOW_WIDTH = 800
