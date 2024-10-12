@@ -3,7 +3,7 @@ import datetime
 from tkinter import ttk
 from tkinter import *
 from home_utils import clear_current_window, center_window
-from company_search_utils import CompanySearchEntry
+from CompanySearch import CompanySearch
 from download_data import download_data
 
 
@@ -76,19 +76,15 @@ def open_company_search_window():
     clear_current_window(root)
 
     # Create a frame for company search entry
-    company_entry_frame = LabelFrame(root, pady=10, borderwidth=0)
+    company_entry_frame = ttk.LabelFrame(root, borderwidth=0)
     company_entry_frame.pack(padx=10, pady=10)
 
     # Replace ttk.Entry with the custom AutocompleteEntry
-    CompanySearchEntry(company_entry_frame)  # Using your custom class
+    company_entry = CompanySearch(company_entry_frame)
 
     # Force window to update to avoid needing to move it
     root.update_idletasks()  # Update all pending tasks
     root.update()  # Force a full window redraw
-
-    # Search button (currently no action assigned)
-    search_button = ttk.Button(root, text="Search", command=lambda: None)
-    search_button.pack(pady=10)
 
     # Back button to return to the menu
     back_button = ttk.Button(root, text="Back to Menu", command=show_menu)
@@ -99,7 +95,7 @@ def open_title_search_window():
     # Clear the current window content
     clear_current_window(root)
 
-    # entry box for title number key
+    # entry box for title number
     title_number_frame = LabelFrame(root, pady=10, borderwidth=0)
     title_number_frame.pack(padx=10, pady=10)
 

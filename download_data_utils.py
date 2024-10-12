@@ -6,7 +6,7 @@ import requests
 import os
 import pandas as pd
 import sqlite3
-from download_data_constants import DATASETS_COLUMNS
+from constants import DATASETS_COLUMNS
 from datetime import datetime
 
 
@@ -243,8 +243,23 @@ def save_to_db(df: pd.DataFrame, table_name: str, db_file: str):
     conn.close()
 
 def create_indexes(db_file):
-    conn = sqlite3.connect(db_file)
-    cur = conn.cursor()
-    cur.execute('CREATE INDEX IF NOT EXISTS idx_owners ON owners (owner)')
-    conn.close()
+    try:
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+
+        # Create indexes if they don't already exist
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_owners ON owners (owner)')
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_owners_owner_id ON owners(owner_id)')
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_titles_owners_owner_id ON titles_owners(owner_id)')
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_titles_owners_title_id ON titles_owners(title_id)')
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_titles_title_id ON titles(title_id)')
+
+        # Commit the changes
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error occurred: {e}")
+    finally:
+        # Close the connection
+        if conn:
+            conn.close()
 

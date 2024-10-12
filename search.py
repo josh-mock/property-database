@@ -34,46 +34,6 @@ def menu(database: PropertyDatabase):
         else:
             print("\nOPTION NOT AVAILABLE")
 
-
-def title_search(database, project_name, title_number=None):
-    if title_number is None:
-        title_number = input("ENTER TITLE NUMBER: ").upper()
-
-    result = database.perform_title_search(title_number)
-    if result != 0:
-        clean_result = clean_title_search_result(result)
-        print_title_search_result(clean_result)
-        save_title_result_to_pdf(clean_result, project_name)
-        print("\nRESULT SAVED AS A PDF.\n")
-    else:
-        print(f"\nNo results for title_number '{title_number}'.")
-
-
-def company_search(database, project_name, company=None):
-    if company is None:
-        company = input("ENTER COMPANY NAME: ").upper()
-
-    result = database.perform_company_search(company)
-    if result == 0:
-        print(f"\nNo results for company {company}.")
-    else:
-        clean_result = clean_company_search_result(result)
-        print_company_search_result(result)
-        save_company_result_to_pdf(clean_result, project_name)
-
-def fuzzy_search(database, project_name, search_term=None):
-    if search_term is None:
-        search_term = input("ENTER SEARCH TERM: ").upper()
-
-    results = database.perform_fuzzy_search(search_term)
-    if len(results) == 0:
-        print(f"No results for company names containing search term '{search_term}'.")
-
-    else:
-        print(f"{len(results)} results for company names containing search term '{search_term}'.")
-        save_fuzzy_result_to_txt(project_name, search_term, results)
-
-
 def print_title_search_result(clean_result):
     print(f"\nSEARCH RESULTS FOR TITLE NUMBER {clean_result["TITLE_NUMBER"]}\n")
     print(tabulate([["TITLE NUMBER","ADDRESS","PRICE LAST PAID"],[clean_result["TITLE_NUMBER"], clean_result["ADDRESS"], clean_result['PRICE']]], headers="firstrow", tablefmt="simple_grid"))
