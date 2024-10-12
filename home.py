@@ -2,7 +2,7 @@ import tkinter as tk
 import datetime
 from tkinter import ttk
 from tkinter import *
-from HomeUtils import clear_current_window, center_window
+from home_utils import clear_current_window, center_window, CompanySearchEntry
 from download_data import download_data
 
 
@@ -62,7 +62,6 @@ def open_download_data():
     buttons_frame = LabelFrame(root, pady=10, borderwidth=0)
     buttons_frame.pack(padx=10, pady=10)  # pack the frame into the root window
 
-
     # Create buttons below the entry and dropdowns
     downlaod_data_button = ttk.Button(buttons_frame, text="Download Data", command=lambda: download_data(api_entry, month_combobox, year_combobox))
     downlaod_data_button.pack()
@@ -75,18 +74,21 @@ def open_company_search_window():
     # Clear the current window content
     clear_current_window(root)
 
-    # Create the search interface for title number
-    label = ttk.Label(root, text="Enter company name below:")
-    label.pack(pady=10)
+    # Create a frame for company search entry
+    company_entry_frame = LabelFrame(root, pady=10, borderwidth=0)
+    company_entry_frame.pack(padx=10, pady=10)
 
-    entry = ttk.Entry(root, width=30)
-    entry.pack(pady=10)
+    # Replace ttk.Entry with the custom AutocompleteEntry
+    CompanySearchEntry(company_entry_frame)  # Using your custom class
 
+    # Search button (currently no action assigned)
     search_button = ttk.Button(root, text="Search", command=lambda: None)
     search_button.pack(pady=10)
 
+    # Back button to return to the menu
     back_button = ttk.Button(root, text="Back to Menu", command=show_menu)
     back_button.pack(pady=10)
+
 
 def open_title_search_window():
     # Clear the current window content

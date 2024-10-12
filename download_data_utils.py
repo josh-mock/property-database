@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import sqlite3
 from download_data_constants import DATASETS_COLUMNS
+from datetime import datetime
 
 
 def validate_api_key(api_entry):
@@ -24,15 +25,33 @@ def validate_date(month_combobox, year_combobox):
     month = month_combobox.get()
     year = year_combobox.get()
 
-    if month and year:
-        return month, year
-    elif month and not year:
-        messagebox.showerror("Error", "Missing dataset publication year")
-    elif year and not month:
+    if not month and not year:
+        messagebox.showerror("Error", "Missing dataset publication month and year")
+        return None
+
+    if not month:
         messagebox.showerror("Error", "Missing dataset publication month")
-    else:
-        messagebox.showerror(
-            "Error", "Missing dataset publication month and year")
+        return None
+
+    if not year:
+        messagebox.showerror("Error", "Missing dataset publication year")
+        return None
+
+    # Check if the selected date is valid
+    try:
+        selected_date = datetime(int(year), int(month), 1)  # 1st day of the selected month/year
+    except ValueError:
+        messagebox.showerror("Error", "Invalid month or year")
+        return None
+
+    # Check if the selected date is in the future
+    current_date = datetime.now()
+    if selected_date > current_date:
+        messagebox.showerror("Error", "Date cannot be in the future")
+        return None
+
+    # Return the valid month and year if all checks pass
+    return month, year
 
 
 def convert_month(month):
@@ -68,28 +87,26 @@ def get_raw_data(api_entry, month_combobox, year_combobox):
 
     month = convert_month(month)
 
-    for datasets in DATASETS_COLUMNS:
-        for dataset in datasets.keys():
+    for dataset in DATASETS_COLUMNS.keys():
+        file_name = f"{dataset.upper()}_FULL_{year}_{month}.zip"
+        headers = {"Authorization": f"{api_key}", "Accept": "application/json"}
+        response = requests.get(
+            fr"https://use-land-property-data.service.gov.uk/api/v1/datasets/{dataset}/{file_name}", headers=headers)
 
-            file_name = f"{dataset.upper()}_FULL_{year}_{month}.zip"
-            headers = {"Authorization": f"{api_key}", "Accept": "application/json"}
-            response = requests.get(
-                fr"https://use-land-property-data.service.gov.uk/api/v1/datasets/{dataset}/{file_name}", headers=headers)
+        downloaded_data = response.json()
 
-            downloaded_data = response.json()
+        download_url = downloaded_data["result"]["download_url"]
+        zip_file = f"{dataset.upper()}.zip"
+        csv_file = f"{dataset.upper()}.csv"
 
-            download_url = downloaded_data["result"]["download_url"]
-            zip_file = f"{dataset.upper()}.zip"
-            csv_file = f"{dataset.upper()}.csv"
+        urllib.request.urlretrieve(download_url, zip_file)
 
-            urllib.request.urlretrieve(download_url, zip_file)
+        with ZipFile(zip_file, "r") as zip:
+            file_name = zip.namelist()[0]
+            zip.extractall()
+            os.rename(file_name, csv_file)
 
-            with ZipFile(zip_file, "r") as zip:
-                file_name = zip.namelist()[0]
-                zip.extractall()
-                os.rename(file_name, csv_file)
-
-            os.remove(zip_file)
+        os.remove(zip_file)
 
 def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.DataFrame:
     """Load CSV data into a DataFrame with specified columns and data types."""

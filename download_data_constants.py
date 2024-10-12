@@ -1,31 +1,27 @@
-DATASETS_COLUMNS = [
-    {
-        "ocod": [
-            "Title Number",
-            "Property Address",
-            "Price Paid",
-            "Proprietor Name (1)",
-            "Proprietor Name (2)",
-            "Proprietor Name (3)",
-            "Proprietor Name (4)",
-            "Country Incorporated (1)",
-            "Country Incorporated (2)",
-            "Country Incorporated (3)",
-            "Country Incorporated (4)",
-        ],
-    },
-    {
-        "ccod": [
-            "Title Number",
-            "Property Address",
-            "Price Paid",
-            "Proprietor Name (1)",
-            "Proprietor Name (2)",
-            "Proprietor Name (3)",
-            "Proprietor Name (4)",
-        ],
-    }
-]
+DATASETS_COLUMNS = {
+    "ocod": [
+        "Title Number",
+        "Property Address",
+        "Price Paid",
+        "Proprietor Name (1)",
+        "Proprietor Name (2)",
+        "Proprietor Name (3)",
+        "Proprietor Name (4)",
+        "Country Incorporated (1)",
+        "Country Incorporated (2)",
+        "Country Incorporated (3)",
+        "Country Incorporated (4)",
+    ],
+    "ccod": [
+        "Title Number",
+        "Property Address",
+        "Price Paid",
+        "Proprietor Name (1)",
+        "Proprietor Name (2)",
+        "Proprietor Name (3)",
+        "Proprietor Name (4)",
+    ]
+}
 
 DTYPE_DICT = {
     "Title Number": "object",
