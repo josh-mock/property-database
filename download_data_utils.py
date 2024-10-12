@@ -241,3 +241,10 @@ def save_to_db(df: pd.DataFrame, table_name: str, db_file: str):
     conn = sqlite3.connect(db_file)
     df.to_sql(table_name, conn, if_exists="replace", index=False)
     conn.close()
+
+def create_indexes(db_file):
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute('CREATE INDEX IF NOT EXISTS idx_owners ON owners (owner)')
+    conn.close()
+

@@ -2,7 +2,8 @@ import tkinter as tk
 import datetime
 from tkinter import ttk
 from tkinter import *
-from home_utils import clear_current_window, center_window, CompanySearchEntry
+from home_utils import clear_current_window, center_window
+from company_search_utils import CompanySearchEntry
 from download_data import download_data
 
 
@@ -80,6 +81,10 @@ def open_company_search_window():
 
     # Replace ttk.Entry with the custom AutocompleteEntry
     CompanySearchEntry(company_entry_frame)  # Using your custom class
+
+    # Force window to update to avoid needing to move it
+    root.update_idletasks()  # Update all pending tasks
+    root.update()  # Force a full window redraw
 
     # Search button (currently no action assigned)
     search_button = ttk.Button(root, text="Search", command=lambda: None)
