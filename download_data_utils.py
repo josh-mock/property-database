@@ -204,7 +204,7 @@ def clean_owner_data(owner: str) -> str:
     owner = re.sub("LTD", "LIMITED", owner, flags=re.IGNORECASE)
 
     # Remove unwanted characters
-    allowed_chars = r"[^A-Z0-9&@£$€¥#.,:; ]"
+    allowed_chars = r"[^()A-Z0-9&@£$€¥#.,:; ]"
     owner = re.sub(allowed_chars, "", owner, flags=re.IGNORECASE)
 
     return owner

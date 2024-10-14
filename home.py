@@ -108,13 +108,11 @@ def open_title_search_window():
     title_number_label.pack(side="left", padx=5, pady=5)
 
     title_number_entry = ttk.Entry(title_number_frame, width=30)
-    # Place entry to the right of the label
     title_number_entry.pack(side="left", padx=5, pady=5)
 
-    # Use lambda to pass the function reference without executing it immediately
     search_button = ttk.Button(
-        root, text="Search", command=lambda: perform_title_search(title_number_entry, root))
-    search_button.pack(pady=10)
+        title_number_frame, text="Search", command=lambda: perform_title_search(title_number_entry, root))
+    search_button.pack(side="left", padx=5, pady=5)
 
     back_button(root, show_menu)
 

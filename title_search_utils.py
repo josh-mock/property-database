@@ -82,9 +82,12 @@ def display_result(result, master):
     owners = result["owners"]
 
     # Create a frame to hold the result
-    results_frame = ttk.LabelFrame(
-        master, text="Search Results", borderwidth=0)
+    results_frame = ttk.LabelFrame(master, borderwidth=0)
     results_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+    # Display the owner information
+    heading = tk.Label(results_frame, text="Search Results")
+    heading.pack(padx=10, pady=10)
 
     # Construct display text
     if address and price:
@@ -102,11 +105,28 @@ def display_result(result, master):
     # Create the table with owners' information
     create_table(results_frame, owners)
 
+    # Show options to save as pdf or csv
+    button_frame = ttk.Frame(master)
+    button_frame.pack(pady=10)
+
+    # Create the buttons
+    save_as_pdf_button = ttk.Button(
+        button_frame, text="PDF", command=lambda: None)
+
+    save_as_pdf_button.pack(side="left", padx=5)
+
+    save_as_csv_button = ttk.Button(
+        button_frame, text="CSV", command=lambda: None)
+    save_as_csv_button.pack(side="left", padx=5)
+
+    # Center the button frame within the master window
+    button_frame.pack(expand=True)
+
 
 def create_table(master, owners):
     """Create a table to display data in the results frame."""
     tree = ttk.Treeview(master, columns=(
-        "Company", "Country"), show='headings')
+        "Company", "Country"), height=5, show='headings')
 
     # Set column headings
     tree.heading("Company", text="Company")
@@ -114,7 +134,7 @@ def create_table(master, owners):
 
     # Set column widths
     tree.column("Company", width=250, anchor=tk.CENTER)
-    tree.column("Country", width=100, anchor=tk.W)
+    tree.column("Country", width=100, anchor=tk.CENTER)
 
     tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
