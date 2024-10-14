@@ -166,7 +166,13 @@ def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.Da
 
 
 def concatenate(ocod_df: pd.DataFrame, ccod_df: pd.DataFrame) -> pd.DataFrame:
-    return pd.concat([ocod_df, ccod_df], axis=0, join="outer", ignore_index=True)
+    merged = pd.concat([ocod_df, ccod_df], axis=0, join="outer", ignore_index=True)
+
+    for i in range(1, 5):
+        merged[f"Proprietor Name ({i})"] = merged[f"Proprietor Name ({i})"].apply(clean_owner_data)
+
+    return merged
+
 
 
 def create_titles_table(df: pd.DataFrame) -> pd.DataFrame:
@@ -228,9 +234,6 @@ def create_owners_table(df: pd.DataFrame) -> pd.DataFrame:
             proprietor_col: "owner",
             country_col: "country"
         })
-
-        # Clean data using the separate function
-        temp_df["owner"] = temp_df["owner"].apply(clean_owner_data)
 
         # Append to the list of owners
         owners_list.append(temp_df)
@@ -296,6 +299,7 @@ def save_to_db(df: pd.DataFrame, table_name: str, db_file: str):
     """Save a DataFrame to an SQLite database."""
     conn = sqlite3.connect(db_file)
     df.to_sql(table_name, conn, if_exists="replace", index=False)
+    create_indexes(db_file)
     conn.close()
 
 

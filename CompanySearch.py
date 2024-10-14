@@ -1,7 +1,11 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
 import sqlite3
 from constants import DATABASE
+from tkinter import ttk, filedialog, messagebox
+import csv
+from fpdf import FPDF
+from datetime import datetime
+from utils import clear_current_window
 
 
 class CompanySearch:
@@ -38,7 +42,7 @@ class CompanySearch:
         self.listbox.bind("<ButtonRelease-1>",
                           self.on_listbox_select)  # Bind click event
 
-    def get_input(self):
+    def get_owner(self):
         """Method to get the current input from the entry widget."""
         return self.entry.get()
 
@@ -149,7 +153,7 @@ class CompanySearch:
     def perform_search(self):
         """Perform the search and update the display."""
         # Get the input from the entry
-        company = self.get_input()
+        company = self.get_owner()
 
         if not company:
             messagebox.showwarning(
@@ -178,34 +182,52 @@ class CompanySearch:
         """Clear the search results from the display."""
         for widget in self.frame.winfo_children():
             if isinstance(widget, tk.Listbox):
-                widget.pack_forget()  # Remove any existing result frames
+                widget.pack_forget()
 
     def display_results(self, result):
-        # define variables
+        """Display the search results in the frame."""
+        # Create a new frame for displaying results
+        self.results_frame = ttk.LabelFrame(self.frame, borderwidth=0)
+        self.results_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+        # Display the owner information
+        heading = tk.Label(self.results_frame, text="Search Results")
+        heading.pack(padx=10, pady=10)
+
         owner = result["owner"]
         country = result["country"]
         number_of_titles = len(result["properties"])
 
-        """Display the search results in the frame."""
-        # Create a new frame for displaying results
-        results_frame = ttk.LabelFrame(self.frame, borderwidth=0)
-        results_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-
-        # Display the owner information
-        heading = tk.Label(results_frame, text="Search Results")
-        heading.pack(padx=10, pady=10)
-
-        if result["country"] is not None:
+        if country is not None:
             company_info_label = tk.Label(
-                results_frame, text=f"{owner} is incorporated in {country}.")
+                self.results_frame, text=f"{owner} is incorporated in {country}.")
             company_info_label.pack(padx=10, pady=10)
 
-        count_label = tk.Label(results_frame, text=f"{
-                               number_of_titles} results for titles owned by {owner}")
+        count_label = tk.Label(
+            self.results_frame, text=f"{number_of_titles} results for titles owned by {owner}")
         count_label.pack(padx=10, pady=10)
 
         # Create a table (Treeview) for the properties
-        self.create_table(results_frame, result['properties'])
+        self.create_table(self.results_frame, result['properties'])
+
+        # Show options to save as PDF or CSV
+        button_frame = ttk.Frame(self.results_frame)
+        button_frame.pack(pady=10)
+
+        # Create the buttons
+        save_as_pdf_button = ttk.Button(
+            button_frame, text="PDF", command=lambda: self.save_company_result_as_pdf(result)
+        )
+        save_as_pdf_button.pack(side="left", padx=5)
+
+        save_as_csv_button = ttk.Button(button_frame, text="CSV", command=lambda: self.save_company_result_as_csv(
+            result))
+        save_as_csv_button.pack(side="left", padx=5)
+
+        new_search_button = ttk.Button(
+            self.results_frame, text="New search", command=self.reset_search
+        )
+        new_search_button.pack()
 
     def create_table(self, master, data):
         """Create a table to display data in the results frame."""
@@ -280,3 +302,104 @@ class CompanySearch:
         if self.tooltip:
             self.tooltip.destroy()
             self.tooltip = None
+
+    def save_company_result_as_csv(self, result):
+        """Save the result to a CSV file."""
+
+        default_filename = f"{result["owner"]}_search_results.csv"
+
+        # Open a file selection dialog
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            initialfile=default_filename,
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+        )
+        if not file_path:
+            return
+
+        # Prepare data for CSV
+        header = ["Title number", "Address", "price"]
+
+        with open(file_path, mode='w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(header)
+
+            for title in result['properties']:
+                writer.writerow([
+                    title["title_number"],
+                    title["address"],
+                    title["price"],
+                ])
+
+    def save_company_result_as_pdf(self, result):
+        def create_company_pdf():
+            pdf = FPDF()
+            pdf.add_page()  # Add a page before adding content
+
+            owner = result["owner"]
+            country = result["country"]
+            properties = result["properties"]
+
+            # Set the font for the title and add it
+            pdf.set_font("Helvetica", "B", 16)
+            pdf.cell(w=0, h=10, txt=f'Company Search Results: {
+                     owner}', border=0, align='C')
+            pdf.ln(10)
+
+            # Add the current date and time
+            now = datetime.now()
+            formatted_date = now.strftime("Produced on %d %B %Y at %H:%M")
+            pdf.set_font("Helvetica", "I", 10)
+            pdf.cell(w=0, h=10, txt=formatted_date, border=0, align='C')
+            pdf.ln(10)  # Add a line break
+
+            # Add property details
+            pdf.set_font("Helvetica", "", 10)
+            if owner and country:
+                display_text = f"{owner} is incorporated in {country}."
+            else:
+                display_text = "No country of incorporation information available."
+
+            # Use multi_cell to wrap text
+            pdf.multi_cell(0, 10, display_text, align='C')
+            pdf.ln(10)  # Add a line break
+
+            pdf.set_font("Helvetica", "", size=8)
+
+            with pdf.table(text_align="CENTER") as table:
+                # Add headers to the table for owner data
+                headers = ['Title Number', 'Address', 'Price']
+                header_row = table.row()
+                for header in headers:
+                    header_row.cell(header)
+
+                # Add the owner data rows
+                for property in properties:
+                    owner_row = table.row()
+                    owner_row.cell(property['title_number'])
+                    owner_row.cell(property['address'])
+                    owner_row.cell(property['price'])
+
+            return pdf
+
+        def save_pdf(pdf, search_term):
+            default_filename = f"{search_term}_search_results.pdf"
+
+            # Open a file selection dialog
+            file_path = filedialog.asksaveasfilename(
+                defaultextension=".pdf",
+                initialfile=default_filename,
+                filetypes=[("PDF files", "*.pdf")])
+            if not file_path:
+                return
+
+            pdf.output(file_path)  # Save the PDF to the selected path
+
+        pdf = create_company_pdf()
+        save_pdf(pdf, result["owner"])
+
+    def reset_search(self):
+        clear_current_window(self.frame)  # Clear the current window
+
+        # Re-initialize the search interface
+        self.__init__(self.frame)

@@ -1,7 +1,7 @@
 from tkinter import messagebox, ttk
 from constants import DATASETS_COLUMNS, DTYPE_DICT, DATABASE
 from download_data_utils import get_raw_data, load_data, concatenate, create_titles_table, create_owners_table, create_titles_owners_table, save_to_db
-from home_utils import make_label
+from utils import make_label
 import os
 import threading
 
@@ -28,7 +28,7 @@ def download_data(root, api_entry, month_combobox, year_combobox):
 
             progress_label.destroy()
 
-            progress_label = make_label(root, text="Cleaning data")
+            progress_label = make_label(root, text="Loading datasets")
 
             ocod_df = load_data(
                 "ocod.csv", DATASETS_COLUMNS["ocod"], DTYPE_DICT, "OCOD")
@@ -37,7 +37,7 @@ def download_data(root, api_entry, month_combobox, year_combobox):
 
             progress_label.destroy()
 
-            progress_label = make_label(root, text="Combining datasets")
+            progress_label = make_label(root, text="Combining and cleaning datasets")
 
             combined_data = concatenate(ocod_df, ccod_df)
 

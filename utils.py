@@ -1,4 +1,5 @@
 from tkinter import ttk
+from fpdf import FPDF
 
 
 def center_window(window, width, height):
@@ -24,6 +25,7 @@ def back_button(root, command):
     back_button = ttk.Button(root, text="Back to Menu", command=command)
     back_button.pack()
     return back_button
+
 
 def make_label(master, text):
     label = ttk.Label(master, text=text)
