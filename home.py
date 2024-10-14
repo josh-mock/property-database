@@ -13,7 +13,7 @@ def download_data_window():
     clear_current_window(root)
 
     # Entry frame for api entry
-    api_entry_frame = ttk.Frame(root, pady=10, borderwidth=0)
+    api_entry_frame = ttk.Frame(root, borderwidth=0)
     api_entry_frame.pack(padx=10, pady=10)
 
     api_label = ttk.Label(api_entry_frame, text="Enter API Key:")
