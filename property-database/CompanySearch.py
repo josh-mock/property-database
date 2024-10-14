@@ -1,7 +1,7 @@
 import tkinter as tk
+from tkinter import ttk, filedialog, messagebox
 import sqlite3
 from constants import DATABASE
-from tkinter import ttk, filedialog, messagebox
 import csv
 from fpdf import FPDF
 from datetime import datetime
@@ -35,7 +35,7 @@ class CompanySearch:
             self.company_entry_frame, text="Search", command=self.perform_search)
         self.search_button.pack(pady=5, padx=5, side=tk.LEFT)
 
-        # Listbox to display suggestions
+        # Listbox for autocomplete
         self.listbox = tk.Listbox(self.frame)
         self.listbox.pack(fill=tk.X, side=tk.BOTTOM, pady=5)
 
@@ -43,7 +43,7 @@ class CompanySearch:
                           self.on_listbox_select)  # Bind click event
 
     def get_owner(self):
-        """Method to get the current input from the entry widget."""
+        """Method to get the current input from the entry widget"""
         return self.entry.get()
 
     def get_owners_list(self):
@@ -103,7 +103,7 @@ class CompanySearch:
         country, source = owner_info[0]
 
         if country is None and source == "CCOD":
-            country = 'the UK'
+            country = "UK"
 
         titles = [{"title_number": title[0], "address": title[1],
                    "price": title[2]} for title in titles_info]
@@ -112,12 +112,12 @@ class CompanySearch:
             if title["price"]:
                 title["price"] = f"GBP {int(title["price"]):,}"
             elif title["price"] is None:
-                title["price"] = ''
+                title["price"] = ""
 
         result = {
-            'owner': owner,
-            'country': country,
-            'properties': titles
+            "owner": owner,
+            "country": country,
+            "properties": titles
         }
 
         return result
@@ -187,7 +187,7 @@ class CompanySearch:
     def display_results(self, result):
         """Display the search results in the frame."""
         # Create a new frame for displaying results
-        self.results_frame = ttk.LabelFrame(self.frame, borderwidth=0)
+        self.results_frame = ttk.LabelFrame(self.frame, borderwidth=0, width=500)
         self.results_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
         # Display the owner information
@@ -208,7 +208,7 @@ class CompanySearch:
         count_label.pack(padx=10, pady=10)
 
         # Create a table (Treeview) for the properties
-        self.create_table(self.results_frame, result['properties'])
+        self.create_table(self.results_frame, result["properties"])
 
         # Show options to save as PDF or CSV
         button_frame = ttk.Frame(self.results_frame)
@@ -232,7 +232,7 @@ class CompanySearch:
     def create_table(self, master, data):
         """Create a table to display data in the results frame."""
         self.tree = ttk.Treeview(master, columns=(
-            "Title Number", "Address", "Price"), show='headings')
+            "Title Number", "Address", "Price"), show="headings")
 
         # Set column headings
         self.tree.heading("Title Number", text="Title Number")
@@ -241,67 +241,18 @@ class CompanySearch:
 
         # Set column widths
         # Width for Title Number
-        self.tree.column("Title Number", width=100, anchor=tk.CENTER)
+        self.tree.column("Title Number", width=25, anchor=tk.W)
         # Width for Address
-        self.tree.column("Address", width=250, anchor=tk.W)
+        self.tree.column("Address", width=450, anchor=tk.CENTER)
         # Width for Price
-        self.tree.column("Price", width=100, anchor=tk.E)
+        self.tree.column("Price", width=25, anchor=tk.E)
 
         self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
         # Insert data into the table
         for item in data:
-            self.tree.insert('', tk.END, values=(
+            self.tree.insert("", tk.END, values=(
                 item["title_number"], item["address"], item["price"]))
-
-        # Bind mouse movement to show tooltip
-        self.tree.bind("<Motion>", self.on_mouse_move)
-
-        # Store tooltip data
-        self.tooltip = None
-        self.current_item = None
-
-    def on_mouse_move(self, event):
-        """Show tooltip when hovering over a tree item."""
-        # Identify the item under the mouse
-        region = self.tree.identify_region(event.x, event.y)
-
-        # Check if the mouse is over an item
-        if region == "cell":
-            # Get the item and column number
-            item = self.tree.identify_row(event.y)
-            column = self.tree.identify_column(event.x)
-
-            # Only show tooltip if over an item
-            if item and column:
-                # Get item values for tooltip
-                item_values = self.tree.item(item, 'values')
-                # Create a tooltip text
-                tooltip_text = f"{item_values[1]}"
-                # Display the tooltip
-                self.show_tooltip(event.x_root, event.y_root, tooltip_text)
-            else:
-                self.hide_tooltip()  # Hide tooltip if not over a valid item
-        else:
-            self.hide_tooltip()  # Hide tooltip if not over a cell
-
-    def show_tooltip(self, x, y, text):
-        """Display a tooltip at the specified coordinates."""
-        if self.tooltip:
-            self.tooltip.destroy()  # Destroy existing tooltip if any
-        self.tooltip = tk.Toplevel(self.frame)
-        self.tooltip.wm_overrideredirect(True)  # Remove window decorations
-        # Position tooltip slightly below the cursor
-        self.tooltip.wm_geometry(f"+{x + 10}+{y + 10}")
-        label = tk.Label(self.tooltip, text=text,
-                         background="lightyellow", borderwidth=1, relief="solid")
-        label.pack()
-
-    def hide_tooltip(self):
-        """Hide the tooltip."""
-        if self.tooltip:
-            self.tooltip.destroy()
-            self.tooltip = None
 
     def save_company_result_as_csv(self, result):
         """Save the result to a CSV file."""
@@ -320,11 +271,11 @@ class CompanySearch:
         # Prepare data for CSV
         header = ["Title number", "Address", "price"]
 
-        with open(file_path, mode='w', newline='') as csvfile:
+        with open(file_path, mode="w", newline="") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(header)
 
-            for title in result['properties']:
+            for title in result["properties"]:
                 writer.writerow([
                     title["title_number"],
                     title["address"],
@@ -342,15 +293,15 @@ class CompanySearch:
 
             # Set the font for the title and add it
             pdf.set_font("Helvetica", "B", 16)
-            pdf.cell(w=0, h=10, txt=f'Company Search Results: {
-                     owner}', border=0, align='C')
+            pdf.cell(w=0, h=10, txt=f"Company Search Results: {
+                     owner}", border=0, align="C")
             pdf.ln(10)
 
             # Add the current date and time
             now = datetime.now()
             formatted_date = now.strftime("Produced on %d %B %Y at %H:%M")
             pdf.set_font("Helvetica", "I", 10)
-            pdf.cell(w=0, h=10, txt=formatted_date, border=0, align='C')
+            pdf.cell(w=0, h=10, txt=formatted_date, border=0, align="C")
             pdf.ln(10)  # Add a line break
 
             # Add property details
@@ -361,14 +312,14 @@ class CompanySearch:
                 display_text = "No country of incorporation information available."
 
             # Use multi_cell to wrap text
-            pdf.multi_cell(0, 10, display_text, align='C')
+            pdf.multi_cell(0, 10, display_text, align="C")
             pdf.ln(10)  # Add a line break
 
             pdf.set_font("Helvetica", "", size=8)
 
             with pdf.table(text_align="CENTER") as table:
                 # Add headers to the table for owner data
-                headers = ['Title Number', 'Address', 'Price']
+                headers = ["Title Number", "Address", "Price"]
                 header_row = table.row()
                 for header in headers:
                     header_row.cell(header)
@@ -376,9 +327,9 @@ class CompanySearch:
                 # Add the owner data rows
                 for property in properties:
                     owner_row = table.row()
-                    owner_row.cell(property['title_number'])
-                    owner_row.cell(property['address'])
-                    owner_row.cell(property['price'])
+                    owner_row.cell(property["title_number"])
+                    owner_row.cell(property["address"])
+                    owner_row.cell(property["price"])
 
             return pdf
 

@@ -1,12 +1,14 @@
+from tkinter import messagebox, ttk
+from constants import DATASETS_COLUMNS, DTYPE_DICT, DATABASE
+from utils import make_label
+import os
+import threading
 import re
-from tkinter import messagebox
 import urllib.request
 from zipfile import ZipFile
 import requests
-import os
 import pandas as pd
 import sqlite3
-from constants import DATASETS_COLUMNS
 from datetime import datetime
 
 
@@ -99,25 +101,30 @@ def get_raw_data(api_entry, month_combobox, year_combobox):
 
         try:
             response = requests.get(
-                fr"https://use-land-property-data.service.gov.uk/api/v1/datasets/{dataset}/{file_name}",
+                fr"https://use-land-property-data.service.gov.uk/api/v1/datasets/{
+                    dataset}/{file_name}",
                 headers=headers
             )
             response.raise_for_status()  # Raise an error for bad responses (4xx or 5xx)
         except requests.exceptions.HTTPError as http_err:
-            messagebox.showerror("HTTP Error", f"HTTP error occurred: {http_err}")
+            messagebox.showerror(
+                "HTTP Error", f"HTTP error occurred: {http_err}")
             return
         except requests.exceptions.RequestException as req_err:
-            messagebox.showerror("Request Error", f"Error occurred while requesting data: {req_err}")
+            messagebox.showerror(
+                "Request Error", f"Error occurred while requesting data: {req_err}")
             return
 
         try:
             downloaded_data = response.json()
         except ValueError:
-            messagebox.showerror("Data Error", "Received invalid JSON response.")
+            messagebox.showerror(
+                "Data Error", "Received invalid JSON response.")
             return
 
         if "result" not in downloaded_data or "download_url" not in downloaded_data["result"]:
-            messagebox.showerror("Data Error", "Download URL not found in the response.")
+            messagebox.showerror(
+                "Data Error", "Download URL not found in the response.")
             return
 
         download_url = downloaded_data["result"]["download_url"]
@@ -127,7 +134,8 @@ def get_raw_data(api_entry, month_combobox, year_combobox):
         try:
             urllib.request.urlretrieve(download_url, zip_file)
         except Exception as download_err:
-            messagebox.showerror("Download Error", f"Error occurred while downloading the file: {download_err}")
+            messagebox.showerror(
+                "Download Error", f"Error occurred while downloading the file: {download_err}")
             return
 
         try:
@@ -138,7 +146,8 @@ def get_raw_data(api_entry, month_combobox, year_combobox):
                 zip.extractall()
                 os.rename(file_name, csv_file)
         except Exception as zip_err:
-            messagebox.showerror("Extraction Error", f"Error occurred while extracting the zip file: {zip_err}")
+            messagebox.showerror(
+                "Extraction Error", f"Error occurred while extracting the zip file: {zip_err}")
             return
         finally:
             # Clean up the zip file regardless of success or failure
@@ -166,13 +175,14 @@ def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.Da
 
 
 def concatenate(ocod_df: pd.DataFrame, ccod_df: pd.DataFrame) -> pd.DataFrame:
-    merged = pd.concat([ocod_df, ccod_df], axis=0, join="outer", ignore_index=True)
+    merged = pd.concat([ocod_df, ccod_df], axis=0,
+                       join="outer", ignore_index=True)
 
     for i in range(1, 5):
-        merged[f"Proprietor Name ({i})"] = merged[f"Proprietor Name ({i})"].apply(clean_owner_data)
+        merged[f"Proprietor Name ({i})"] = merged[f"Proprietor Name ({
+            i})"].apply(clean_owner_data)
 
     return merged
-
 
 
 def create_titles_table(df: pd.DataFrame) -> pd.DataFrame:
@@ -206,7 +216,7 @@ def clean_owner_data(owner: str) -> str:
     # Remove extra spaces and make it uppercase
     owner = re.sub(r"\s{2,}", " ", owner.strip()).upper()
 
-    # Replace "LTD" with "LIMITED"
+    # Replace "LTD" with "LIMITED" to minimise duplicates
     owner = re.sub("LTD", "LIMITED", owner, flags=re.IGNORECASE)
 
     # Remove unwanted characters
@@ -227,7 +237,8 @@ def create_owners_table(df: pd.DataFrame) -> pd.DataFrame:
         source = "source"
 
         # Select the proprietor and country columns, dropping rows with NaN proprietors
-        temp_df = df[[proprietor_col, country_col, source]].dropna(subset=[proprietor_col])
+        temp_df = df[[proprietor_col, country_col, source]].dropna(subset=[
+                                                                   proprietor_col])
 
         # Rename columns to common "Proprietor Name" and "Country Incorporated"
         temp_df = temp_df.rename(columns={
@@ -239,7 +250,8 @@ def create_owners_table(df: pd.DataFrame) -> pd.DataFrame:
         owners_list.append(temp_df)
 
     # Concatenate all owners into a single DataFrame, remove duplicates, and add a unique ID
-    owners_df = pd.concat(owners_list, ignore_index=True).drop_duplicates(subset="owner")
+    owners_df = pd.concat(
+        owners_list, ignore_index=True).drop_duplicates(subset="owner")
 
     # Add unique ID to each owner
     owners_df["owner_id"] = range(1, len(owners_df) + 1)
@@ -309,12 +321,12 @@ def create_indexes(db_file):
         cur = conn.cursor()
 
         indexes = [
-            'CREATE INDEX IF NOT EXISTS idx_owners ON owners (owner)',
-            'CREATE INDEX IF NOT EXISTS idx_owners_owner_id ON owners(owner_id)',
-            'CREATE INDEX IF NOT EXISTS idx_titles_owners_owner_id ON titles_owners(owner_id)',
-            'CREATE INDEX IF NOT EXISTS idx_titles_owners_title_id ON titles_owners(title_id)',
-            'CREATE INDEX IF NOT EXISTS idx_titles_title_id ON titles(title_id)',
-            'CREATE INDEX IF NOT EXISTS idx_titles_title_number ON titles(title_number)'
+            "CREATE INDEX IF NOT EXISTS idx_owners ON owners (owner)",
+            "CREATE INDEX IF NOT EXISTS idx_owners_owner_id ON owners(owner_id)",
+            "CREATE INDEX IF NOT EXISTS idx_titles_owners_owner_id ON titles_owners(owner_id)",
+            "CREATE INDEX IF NOT EXISTS idx_titles_owners_title_id ON titles_owners(title_id)",
+            "CREATE INDEX IF NOT EXISTS idx_titles_title_id ON titles(title_id)",
+            "CREATE INDEX IF NOT EXISTS idx_titles_title_number ON titles(title_number)"
         ]
 
         # Create indexes if they don't already exist
@@ -329,3 +341,81 @@ def create_indexes(db_file):
         # Close the connection
         if conn:
             conn.close()
+
+
+def download_data(root, api_entry, month_combobox, year_combobox):
+
+    # Create and display the progress bar
+    pb = ttk.Progressbar(
+        root,
+        orient="horizontal",
+        mode="indeterminate",
+        length=280)
+    pb.pack(pady=20)
+    pb.start()  # Start the progress bar
+
+    def download_task():
+        try:
+            progress_label = make_label(root, text="Downloading datasets")
+
+            response = get_raw_data(api_entry, month_combobox, year_combobox)
+
+            if response == 1:
+                return
+
+            progress_label.destroy()
+
+            progress_label = make_label(root, text="Loading datasets")
+
+            ocod_df = load_data(
+                "ocod.csv", DATASETS_COLUMNS["ocod"], DTYPE_DICT, "OCOD")
+            ccod_df = load_data(
+                "ccod.csv", DATASETS_COLUMNS["ccod"], DTYPE_DICT, "CCOD")
+
+            progress_label.destroy()
+
+            progress_label = make_label(
+                root, text="Combining and cleaning datasets")
+
+            combined_data = concatenate(ocod_df, ccod_df)
+
+            titles = create_titles_table(combined_data)
+
+            owners = create_owners_table(combined_data)
+
+            titles_owners = create_titles_owners_table(
+                combined_data, titles, owners)
+
+            progress_label.destroy()
+
+            progress_label = make_label(root, "Creating database")
+
+            # Save the tables to an SQLite .db file
+            save_to_db(titles, "titles", DATABASE)
+            save_to_db(owners, "owners", DATABASE)
+            save_to_db(titles_owners, "titles_owners", DATABASE)
+
+            progress_label.destroy()
+
+            progress_label = make_label(root, "Cleaning up")
+
+            os.remove("ocod.csv")
+            os.remove("ccod.csv")
+
+            progress_label.destroy()
+
+            # Stop the progress bar and remove it from the UI
+            pb.stop()
+            pb.pack_forget()
+
+            messagebox.showinfo(title="Success", message="Download completed")
+
+        except Exception as e:
+            pb.stop()
+            pb.pack_forget()
+            progress_label.destroy()
+            messagebox.showinfo(
+                title="Error", message=f"Error downloading data: {e}")
+
+    # Run the download task in a separate thread to avoid blocking the UI
+    threading.Thread(target=download_task).start()

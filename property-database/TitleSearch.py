@@ -5,6 +5,7 @@ import tkinter as tk
 import csv
 from fpdf import FPDF
 from datetime import datetime
+from utils import back_button
 
 
 class TitleSearch:
@@ -27,7 +28,7 @@ class TitleSearch:
             self.title_number_frame, text="Search", command=self.perform_title_search)
         self.search_button.pack(side="left", padx=5, pady=5)
 
-        self.results_frame = None  # Will be created during search
+        self.results_frame = None
 
     def get_title_number(self):
         return self.title_number_entry.get().upper()
@@ -127,7 +128,8 @@ class TitleSearch:
         owners = result["owners"]
 
         # Create a frame to hold the result
-        self.results_frame = ttk.LabelFrame(self.frame, borderwidth=0)
+        self.results_frame = ttk.LabelFrame(
+            self.frame, borderwidth=0)
         self.results_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
         # Display the owner information
@@ -152,7 +154,7 @@ class TitleSearch:
         self.create_table(self.results_frame, owners)
 
         # Show options to save as PDF or CSV
-        button_frame = ttk.Frame(self.results_frame)
+        button_frame = ttk.Frame(self.frame)
         button_frame.pack(pady=10)
 
         # Create the buttons
@@ -228,7 +230,8 @@ class TitleSearch:
 
             # Set the font for the title and add it
             pdf.set_font("Helvetica", "B", 16)
-            pdf.cell(w=0, h=10, txt=f'Title Search Results: {title_number}', border=0, align='C')
+            pdf.cell(w=0, h=10, txt=f'Title Search Results: {
+                     title_number}', border=0, align='C')
             pdf.ln(10)  # Add a line break
 
             # Add the current date and time
@@ -241,15 +244,18 @@ class TitleSearch:
             # Add property details
             pdf.set_font("Helvetica", "", 10)
             if address and price:
-                display_text = f"{title_number} is located at {address}.\n\nThe price last paid for the property was {price}."
+                display_text = f"{title_number} is located at {
+                    address}.\n\nThe price last paid for the property was {price}."
             elif address:
                 display_text = f"{title_number} is located at {address}."
             elif price:
-                display_text = f"The price last paid for the property was {price}."
+                display_text = f"The price last paid for the property was {
+                    price}."
             else:
                 display_text = "No address or price information available."
 
-            pdf.multi_cell(0, 10, display_text, align='C')  # Use multi_cell to wrap text
+            # Use multi_cell to wrap text
+            pdf.multi_cell(0, 10, display_text, align='C')
             pdf.ln(10)  # Add a line break
 
             # Add owners' information as a table

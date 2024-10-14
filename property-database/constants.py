@@ -39,4 +39,4 @@ DTYPE_DICT = {
     "Country Incorporated (3)": "object",
     "Country Incorporated (4)": "object"}
 
-DATABASE = 'data/land_property_data.db'
+DATABASE = "data/land_property_data.db"

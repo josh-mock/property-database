@@ -1,5 +1,4 @@
 from tkinter import ttk
-from fpdf import FPDF
 
 
 def center_window(window, width, height):
@@ -31,3 +30,4 @@ def make_label(master, text):
     label = ttk.Label(master, text=text)
     label.pack()
     return label
+
