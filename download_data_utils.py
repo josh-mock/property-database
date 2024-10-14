@@ -96,23 +96,54 @@ def get_raw_data(api_entry, month_combobox, year_combobox):
     for dataset in DATASETS_COLUMNS.keys():
         file_name = f"{dataset.upper()}_FULL_{year}_{month}.zip"
         headers = {"Authorization": f"{api_key}", "Accept": "application/json"}
-        response = requests.get(
-            fr"https://use-land-property-data.service.gov.uk/api/v1/datasets/{dataset}/{file_name}", headers=headers)
 
-        downloaded_data = response.json()
+        try:
+            response = requests.get(
+                fr"https://use-land-property-data.service.gov.uk/api/v1/datasets/{dataset}/{file_name}",
+                headers=headers
+            )
+            response.raise_for_status()  # Raise an error for bad responses (4xx or 5xx)
+        except requests.exceptions.HTTPError as http_err:
+            messagebox.showerror("HTTP Error", f"HTTP error occurred: {http_err}")
+            return
+        except requests.exceptions.RequestException as req_err:
+            messagebox.showerror("Request Error", f"Error occurred while requesting data: {req_err}")
+            return
+
+        try:
+            downloaded_data = response.json()
+        except ValueError:
+            messagebox.showerror("Data Error", "Received invalid JSON response.")
+            return
+
+        if "result" not in downloaded_data or "download_url" not in downloaded_data["result"]:
+            messagebox.showerror("Data Error", "Download URL not found in the response.")
+            return
 
         download_url = downloaded_data["result"]["download_url"]
         zip_file = f"{dataset.upper()}.zip"
         csv_file = f"{dataset.upper()}.csv"
 
-        urllib.request.urlretrieve(download_url, zip_file)
+        try:
+            urllib.request.urlretrieve(download_url, zip_file)
+        except Exception as download_err:
+            messagebox.showerror("Download Error", f"Error occurred while downloading the file: {download_err}")
+            return
 
-        with ZipFile(zip_file, "r") as zip:
-            file_name = zip.namelist()[0]
-            zip.extractall()
-            os.rename(file_name, csv_file)
-
-        os.remove(zip_file)
+        try:
+            with ZipFile(zip_file, "r") as zip:
+                if not zip.namelist():
+                    raise Exception("Zip file is empty or corrupted.")
+                file_name = zip.namelist()[0]
+                zip.extractall()
+                os.rename(file_name, csv_file)
+        except Exception as zip_err:
+            messagebox.showerror("Extraction Error", f"Error occurred while extracting the zip file: {zip_err}")
+            return
+        finally:
+            # Clean up the zip file regardless of success or failure
+            if os.path.exists(zip_file):
+                os.remove(zip_file)
 
     return 0
 
@@ -161,6 +192,24 @@ def create_titles_table(df: pd.DataFrame) -> pd.DataFrame:
     return titles
 
 
+def clean_owner_data(owner: str) -> str:
+    """Clean the 'owner' column data."""
+    if not isinstance(owner, str):
+        return owner
+
+    # Remove extra spaces and make it uppercase
+    owner = re.sub(r"\s{2,}", " ", owner.strip()).upper()
+
+    # Replace "LTD" with "LIMITED"
+    owner = re.sub("LTD", "LIMITED", owner, flags=re.IGNORECASE)
+
+    # Remove unwanted characters
+    allowed_chars = r"[^A-Z0-9&@£$€¥#.,:; ]"
+    owner = re.sub(allowed_chars, "", owner, flags=re.IGNORECASE)
+
+    return owner
+
+
 def create_owners_table(df: pd.DataFrame) -> pd.DataFrame:
     """Create the 'Owners' table by unpivoting proprietor and country columns."""
     owners_list = []
@@ -172,8 +221,7 @@ def create_owners_table(df: pd.DataFrame) -> pd.DataFrame:
         source = "source"
 
         # Select the proprietor and country columns, dropping rows with NaN proprietors
-        temp_df = df[[proprietor_col, country_col, source]].dropna(
-            subset=[proprietor_col])
+        temp_df = df[[proprietor_col, country_col, source]].dropna(subset=[proprietor_col])
 
         # Rename columns to common "Proprietor Name" and "Country Incorporated"
         temp_df = temp_df.rename(columns={
@@ -181,16 +229,15 @@ def create_owners_table(df: pd.DataFrame) -> pd.DataFrame:
             country_col: "country"
         })
 
-        # Clean data
-        temp_df["owner"] = temp_df["owner"].apply(lambda x: re.sub(
-            r"\s{2,}", " ", x.strip()).upper() if isinstance(x, str) else x)
+        # Clean data using the separate function
+        temp_df["owner"] = temp_df["owner"].apply(clean_owner_data)
 
         # Append to the list of owners
         owners_list.append(temp_df)
 
     # Concatenate all owners into a single DataFrame, remove duplicates, and add a unique ID
-    owners_df = pd.concat(
-        owners_list, ignore_index=True).drop_duplicates(subset="owner")
+    owners_df = pd.concat(owners_list, ignore_index=True).drop_duplicates(subset="owner")
+
     # Add unique ID to each owner
     owners_df["owner_id"] = range(1, len(owners_df) + 1)
 
