@@ -23,3 +23,9 @@ def back_button(root, back_command):
     # Create a reusable back button
     back_button = ttk.Button(root, text="Back to Menu", command=back_command)
     back_button.pack(anchor="center", pady=10)
+    return back_button
+
+def make_label(master, text):
+    label = ttk.Label(master, text=text)
+    label.pack()
+    return label
