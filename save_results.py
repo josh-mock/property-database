@@ -2,6 +2,7 @@ import os
 from fpdf import FPDF
 from datetime import datetime
 
+
 def save_title_result_to_pdf(clean_result, project_name):
     pdf = FPDF()
     title_number = clean_result['TITLE_NUMBER']
@@ -11,7 +12,8 @@ def save_title_result_to_pdf(clean_result, project_name):
     # Title of the PDF
 
     pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(w=0, h=10, text=f'RESULTS OF TITLE SEARCH: {title_number}', border=0, align='C')
+    pdf.cell(w=0, h=10, text=f'RESULTS OF TITLE SEARCH: {
+             title_number}', border=0, align='C')
     pdf.ln()  # Add some space after the title
 
     now = datetime.now()
@@ -19,7 +21,6 @@ def save_title_result_to_pdf(clean_result, project_name):
     pdf.set_font("Helvetica", "I", 10)
     pdf.cell(w=0, h=10, text=f'{formatted_date}', border=0, align='C')
     pdf.ln()
-
 
     title_table_data = (
         ("TITLE NUMBER", "ADDRESS", "PRICE LAST PAID"),
@@ -34,10 +35,10 @@ def save_title_result_to_pdf(clean_result, project_name):
             for datum in data_row:
                 row.cell(datum)
 
-
     pdf.ln()
     pdf.set_font("Helvetica", "", size=10)
-    pdf.cell(w=0, h=10, text=f'{title_number} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:', border=0, align='C')
+    pdf.cell(w=0, h=10, text=f'{
+             title_number} IS OWNED BY THE FOLLOWING COMPANY/COMPANIES:', border=0, align='C')
     pdf.ln()
 
     pdf.set_font("Helvetica", "", size=8)
@@ -57,14 +58,17 @@ def save_title_result_to_pdf(clean_result, project_name):
 
     pdf.ln()
     pdf.set_font("Helvetica", "", size=10)
-    pdf.multi_cell(w=0, h=10, text=f'THE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES', border=0, align='C')
+    pdf.multi_cell(
+        w=0, h=10, text=f'THE PROPERTY MAY HAVE OTHER OWNERS NOT COVERED IN THE CCOD AND/OR OCOD DATABASES', border=0, align='C')
 
     if not os.path.exists(rf'results/{project_name}'):
         os.makedirs(f'results/{project_name}')
 
-    filename = os.path.join(fr'results/{project_name}', f"title_{title_number}.pdf")
+    filename = os.path.join(
+        fr'results/{project_name}', f"title_{title_number}.pdf")
 
     pdf.output(filename)
+
 
 def save_company_result_to_pdf(clean_result, project_name):
     pdf = FPDF()
@@ -74,7 +78,8 @@ def save_company_result_to_pdf(clean_result, project_name):
     # Title of the PDF
 
     pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(w=0, h=10, text=f'RESULTS OF COMPANY SEARCH: {company}', border=0, align='C')
+    pdf.cell(w=0, h=10, text=f'RESULTS OF COMPANY SEARCH: {
+             company}', border=0, align='C')
     pdf.ln()  # Add some space after the title
 
     now = datetime.now()
@@ -85,9 +90,11 @@ def save_company_result_to_pdf(clean_result, project_name):
 
     pdf.set_font("Helvetica", "", 8)
     if country != 'NO DATA':
-        pdf.multi_cell(w=0, h=10, text=f'{company} INCORPORATED IN {country} OWNS THE FOLLOWING PROPERTY/PROPERTIES:', border=0, align='C')
+        pdf.multi_cell(w=0, h=10, text=f'{company} INCORPORATED IN {
+                       country} OWNS THE FOLLOWING PROPERTY/PROPERTIES:', border=0, align='C')
     else:
-        pdf.multi_cell(w=0, h=10, text=f'{company} OWNS THE FOLLOWING PROPERTY/PROPERTIES:', border=0, align='C')
+        pdf.multi_cell(w=0, h=10, text=f'{
+                       company} OWNS THE FOLLOWING PROPERTY/PROPERTIES:', border=0, align='C')
 
     pdf.set_font("Helvetica", "", size=8)
 
@@ -105,19 +112,21 @@ def save_company_result_to_pdf(clean_result, project_name):
             owner_row.cell(property['ADDRESS'])
             owner_row.cell(property['PRICE LAST PAID'])
 
-
     if not os.path.exists(rf'results/{project_name}'):
         os.makedirs(f'results/{project_name}')
 
-    filename = os.path.join(fr'results/{project_name}', f"company_{company}.pdf")
+    filename = os.path.join(
+        fr'results/{project_name}', f"company_{company}.pdf")
 
     pdf.output(filename)
+
 
 def save_fuzzy_result_to_txt(project_name, search_term, results):
     if not os.path.exists(rf'results/{project_name}'):
         os.makedirs(f'results/{project_name}')
 
-    filename = os.path.join(fr'results/{project_name}', f"fuzzy_{search_term}.txt")
+    filename = os.path.join(
+        fr'results/{project_name}', f"fuzzy_{search_term}.txt")
 
     with open(filename, 'w') as file:
         for result in results:

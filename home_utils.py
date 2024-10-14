@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import ttk
 
 
 def center_window(window, width, height):
@@ -19,3 +19,7 @@ def clear_current_window(root):
         widget.destroy()
 
 
+def back_button(root, back_command):
+    # Create a reusable back button
+    back_button = ttk.Button(root, text="Back to Menu", command=back_command)
+    back_button.pack(anchor="center", pady=10)

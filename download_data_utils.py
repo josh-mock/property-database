@@ -21,12 +21,13 @@ def validate_api_key(api_entry):
         messagebox.showerror("Error", "Invalid API key.")
 
 
-def validate_date(month_combobox, year_combobox):
+def get_date(month_combobox, year_combobox):
     month = month_combobox.get()
     year = year_combobox.get()
 
     if not month and not year:
-        messagebox.showerror("Error", "Missing dataset publication month and year")
+        messagebox.showerror(
+            "Error", "Missing dataset publication month and year")
         return None
 
     if not month:
@@ -37,24 +38,29 @@ def validate_date(month_combobox, year_combobox):
         messagebox.showerror("Error", "Missing dataset publication year")
         return None
 
-    # Check if the selected date is valid
-    try:
-        selected_date = datetime(int(year), int(month), 1)  # 1st day of the selected month/year
-    except ValueError:
-        messagebox.showerror("Error", "Invalid month or year")
-        return None
-
-    # Check if the selected date is in the future
-    current_date = datetime.now()
-    if selected_date > current_date:
-        messagebox.showerror("Error", "Date cannot be in the future")
-        return None
-
     # Return the valid month and year if all checks pass
-    return month, year
+    return (month, year)
 
 
-def convert_month(month):
+def validate_date(month_year: tuple) -> tuple:
+    month, year = month_year
+
+    month = convert_month(month)
+
+    selected_date = datetime(int(year), int(month), 1)
+
+    current_datetime = datetime.now()
+    current_month_start = datetime(
+        current_datetime.year, current_datetime.month, 1)
+
+    if selected_date > current_month_start:
+        messagebox.showerror("Error", "Date cannot be in the future.")
+        return 1
+
+    return (month, year)
+
+
+def convert_month(month: str) -> str:
     month_to_number = {
         "January": "01",
         "February": "02",
@@ -79,13 +85,13 @@ def get_raw_data(api_entry, month_combobox, year_combobox):
     if not api_key:
         return
 
-    date = validate_date(month_combobox, year_combobox)
-    if not date:
+    date = get_date(month_combobox, year_combobox)
+    valid_date = validate_date(date)
+
+    if valid_date == 1:
         return
 
-    month, year = date
-
-    month = convert_month(month)
+    month, year = valid_date
 
     for dataset in DATASETS_COLUMNS.keys():
         file_name = f"{dataset.upper()}_FULL_{year}_{month}.zip"
@@ -108,6 +114,9 @@ def get_raw_data(api_entry, month_combobox, year_combobox):
 
         os.remove(zip_file)
 
+    return 0
+
+
 def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.DataFrame:
     """Load CSV data into a DataFrame with specified columns and data types."""
     # Check if the file exists
@@ -115,10 +124,8 @@ def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.Da
         raise FileNotFoundError(f"The file {file_path} does not exist.")
 
     # Load the CSV file into a DataFrame
-    data = pd.read_csv(file_path, encoding="utf-8", usecols=columns, dtype=dtypes)
-
-    # Replace NaN values with "NO DATA"
-    data = data.apply(lambda col: col.fillna("NO DATA") if col.name != "Price Paid" else col)
+    data = pd.read_csv(file_path, encoding="utf-8",
+                       usecols=columns, dtype=dtypes)
 
     filtered_data = data[data["Title Number"] != "Row Count"]
 
@@ -126,8 +133,10 @@ def load_data(file_path: str, columns: list, dtypes: dict, source: str) -> pd.Da
 
     return filtered_data
 
+
 def concatenate(ocod_df: pd.DataFrame, ccod_df: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([ocod_df, ccod_df], axis=0, join="outer", ignore_index=True)
+
 
 def create_titles_table(df: pd.DataFrame) -> pd.DataFrame:
     """Create the 'Titles' table with unique IDs and clean text data."""
@@ -242,17 +251,24 @@ def save_to_db(df: pd.DataFrame, table_name: str, db_file: str):
     df.to_sql(table_name, conn, if_exists="replace", index=False)
     conn.close()
 
+
 def create_indexes(db_file):
     try:
         conn = sqlite3.connect(db_file)
         cur = conn.cursor()
 
+        indexes = [
+            'CREATE INDEX IF NOT EXISTS idx_owners ON owners (owner)',
+            'CREATE INDEX IF NOT EXISTS idx_owners_owner_id ON owners(owner_id)',
+            'CREATE INDEX IF NOT EXISTS idx_titles_owners_owner_id ON titles_owners(owner_id)',
+            'CREATE INDEX IF NOT EXISTS idx_titles_owners_title_id ON titles_owners(title_id)',
+            'CREATE INDEX IF NOT EXISTS idx_titles_title_id ON titles(title_id)',
+            'CREATE INDEX IF NOT EXISTS idx_titles_title_number ON titles(title_number)'
+        ]
+
         # Create indexes if they don't already exist
-        cur.execute('CREATE INDEX IF NOT EXISTS idx_owners ON owners (owner)')
-        cur.execute('CREATE INDEX IF NOT EXISTS idx_owners_owner_id ON owners(owner_id)')
-        cur.execute('CREATE INDEX IF NOT EXISTS idx_titles_owners_owner_id ON titles_owners(owner_id)')
-        cur.execute('CREATE INDEX IF NOT EXISTS idx_titles_owners_title_id ON titles_owners(title_id)')
-        cur.execute('CREATE INDEX IF NOT EXISTS idx_titles_title_id ON titles(title_id)')
+        for index in indexes:
+            cur.execute(index)
 
         # Commit the changes
         conn.commit()
@@ -262,4 +278,3 @@ def create_indexes(db_file):
         # Close the connection
         if conn:
             conn.close()
-

@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import LabelFrame, ttk, messagebox
+from tkinter import ttk, messagebox
 import sqlite3
 from constants import DATABASE
+
 
 class CompanySearch:
     def __init__(self, master):
@@ -15,7 +16,8 @@ class CompanySearch:
         self.company_entry_frame.pack(padx=10, pady=10, side=tk.TOP)
 
         # Label widget for company name
-        self.label = tk.Label(self.company_entry_frame, text="Enter company name")
+        self.label = tk.Label(self.company_entry_frame,
+                              text="Enter company name")
         self.label.pack(padx=5, pady=5, side=tk.LEFT)
 
         # Entry widget for user input
@@ -25,7 +27,8 @@ class CompanySearch:
         self.entry.bind("<KeyRelease>", self.on_key_release)
 
         # Search button
-        self.search_button = ttk.Button(self.company_entry_frame, text="Search", command=self.perform_search)
+        self.search_button = ttk.Button(
+            self.company_entry_frame, text="Search", command=self.perform_search)
         self.search_button.pack(pady=5, padx=5, side=tk.LEFT)
 
         # Listbox to display suggestions
@@ -98,7 +101,14 @@ class CompanySearch:
         if country is None and source == "CCOD":
             country = 'the UK'
 
-        titles = [{"title_number": title[0], "address": title[1], "price": title[2]} for title in titles_info]
+        titles = [{"title_number": title[0], "address": title[1],
+                   "price": title[2]} for title in titles_info]
+
+        for title in titles:
+            if title["price"]:
+                title["price"] = f"GBP {int(title["price"]):,}"
+            elif title["price"] is None:
+                title["price"] = ''
 
         result = {
             'owner': owner,
@@ -124,11 +134,14 @@ class CompanySearch:
     def on_listbox_select(self, event):
         # Get the currently selected item
         try:
-            selected_index = self.listbox.curselection()  # Get the index of the selected item
+            # Get the index of the selected item
+            selected_index = self.listbox.curselection()
             if selected_index:  # Check if anything is selected
-                selected_word = self.listbox.get(selected_index)  # Get the selected item
+                selected_word = self.listbox.get(
+                    selected_index)  # Get the selected item
                 self.entry.delete(0, tk.END)  # Clear the entry
-                self.entry.insert(0, selected_word)  # Insert the selected owner into the entry
+                # Insert the selected owner into the entry
+                self.entry.insert(0, selected_word)
                 self.listbox.delete(0, tk.END)  # Clear the listbox suggestions
         except tk.TclError:
             pass
@@ -136,25 +149,27 @@ class CompanySearch:
     def perform_search(self):
         """Perform the search and update the display."""
         # Get the input from the entry
-        query = self.get_input()
+        company = self.get_input()
 
-        if not query:
-            messagebox.showwarning("Input Error", "Please enter a company name.")
+        if not company:
+            messagebox.showwarning(
+                "Input Error", "Please enter a company name.")
             return
 
         # remove listbox
         self.hide_listbox()
 
         # Fetch owner information and titles for the specified owner
-        owner_info = self.get_owner_info(query)
-        titles_info = self.get_titles_for_company(query)
-
+        owner_info = self.get_owner_info(company)
         if not owner_info:
-            messagebox.showinfo("No Results", "No results found for your search.")
+            messagebox.showinfo(
+                "No Results", f"No results found for '{company}'.")
             return
 
+        titles_info = self.get_titles_for_company(company)
+
         # Create a structured result
-        result = self.create_result(query, owner_info, titles_info)
+        result = self.create_result(company, owner_info, titles_info)
 
         # Display the results
         self.display_results(result)
@@ -181,28 +196,87 @@ class CompanySearch:
         heading.pack(padx=10, pady=10)
 
         if result["country"] is not None:
-            company_info_label = tk.Label(results_frame, text=f"{owner} is incorporated in {country}.")
+            company_info_label = tk.Label(
+                results_frame, text=f"{owner} is incorporated in {country}.")
             company_info_label.pack(padx=10, pady=10)
 
-        count_label = tk.Label(results_frame, text=f"{number_of_titles} results for titles owned by {owner}")
+        count_label = tk.Label(results_frame, text=f"{
+                               number_of_titles} results for titles owned by {owner}")
         count_label.pack(padx=10, pady=10)
 
-        # # Create a table (Treeview) for the properties
-        # self.create_table(results_frame, result['properties'])
+        # Create a table (Treeview) for the properties
+        self.create_table(results_frame, result['properties'])
 
-    # def create_table(self, master, data):
-    #     """Create a table to display data in the results frame."""
-    #     tree = ttk.Treeview(master, columns=("Title Number", "Address", "Price"), show='headings')
-    #     tree.heading("Title Number", text="Title Number")
-    #     tree.heading("Address", text="Address")
-    #     tree.heading("Price", text="Price")
-    #     tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+    def create_table(self, master, data):
+        """Create a table to display data in the results frame."""
+        self.tree = ttk.Treeview(master, columns=(
+            "Title Number", "Address", "Price"), show='headings')
 
-    #     for item in data:
-    #         tree.insert('', tk.END, values=(item["title_number"], item["address"], item["price"]))
+        # Set column headings
+        self.tree.heading("Title Number", text="Title Number")
+        self.tree.heading("Address", text="Address")
+        self.tree.heading("Price", text="Price")
 
+        # Set column widths
+        # Width for Title Number
+        self.tree.column("Title Number", width=100, anchor=tk.CENTER)
+        # Width for Address
+        self.tree.column("Address", width=250, anchor=tk.W)
+        # Width for Price
+        self.tree.column("Price", width=100, anchor=tk.E)
 
+        self.tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
+        # Insert data into the table
+        for item in data:
+            self.tree.insert('', tk.END, values=(
+                item["title_number"], item["address"], item["price"]))
 
+        # Bind mouse movement to show tooltip
+        self.tree.bind("<Motion>", self.on_mouse_move)
 
+        # Store tooltip data
+        self.tooltip = None
+        self.current_item = None
 
+    def on_mouse_move(self, event):
+        """Show tooltip when hovering over a tree item."""
+        # Identify the item under the mouse
+        region = self.tree.identify_region(event.x, event.y)
+
+        # Check if the mouse is over an item
+        if region == "cell":
+            # Get the item and column number
+            item = self.tree.identify_row(event.y)
+            column = self.tree.identify_column(event.x)
+
+            # Only show tooltip if over an item
+            if item and column:
+                # Get item values for tooltip
+                item_values = self.tree.item(item, 'values')
+                # Create a tooltip text
+                tooltip_text = f"{item_values[1]}"
+                # Display the tooltip
+                self.show_tooltip(event.x_root, event.y_root, tooltip_text)
+            else:
+                self.hide_tooltip()  # Hide tooltip if not over a valid item
+        else:
+            self.hide_tooltip()  # Hide tooltip if not over a cell
+
+    def show_tooltip(self, x, y, text):
+        """Display a tooltip at the specified coordinates."""
+        if self.tooltip:
+            self.tooltip.destroy()  # Destroy existing tooltip if any
+        self.tooltip = tk.Toplevel(self.frame)
+        self.tooltip.wm_overrideredirect(True)  # Remove window decorations
+        # Position tooltip slightly below the cursor
+        self.tooltip.wm_geometry(f"+{x + 10}+{y + 10}")
+        label = tk.Label(self.tooltip, text=text,
+                         background="lightyellow", borderwidth=1, relief="solid")
+        label.pack()
+
+    def hide_tooltip(self):
+        """Hide the tooltip."""
+        if self.tooltip:
+            self.tooltip.destroy()
+            self.tooltip = None
