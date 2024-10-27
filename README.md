@@ -5,10 +5,16 @@ This programme merges the OCOD and CCOD datasets released by the UK land registr
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the programme.
+Download the release from the release page or clone the repository from GitHub
 
 ```bash
-pip install uk-land-registry-search
+git clone https://github.com/jwmock88/property-database
+```
+
+Install the required pip packages
+
+```python
+pip install -r requirements.txt
 ```
 
 ## Usage
