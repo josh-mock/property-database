@@ -18,9 +18,10 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+From the project directory run
 
 ```python
-python run uk-land-registry-search
+python home.py
 ```
 
 ## Features
