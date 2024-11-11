@@ -360,6 +360,8 @@ def create_titles_owners_table(combined_data: pd.DataFrame, titles_df: pd.DataFr
 
 def save_to_db(df: pd.DataFrame, table_name: str, db_file: str):
     """Save a DataFrame to an SQLite database and create indexes."""
+    os.makedirs(os.path.dirname(db_file), exist_ok=True)
+
     conn = sqlite3.connect(db_file)
     df.to_sql(table_name, conn, if_exists="replace", index=False)
     conn.close()
