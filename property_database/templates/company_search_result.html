@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Company Search Results</title>
+{% endblock %}
+
+{% block body %}
+    <h1>UK Property Data Search</h1>
+    <h2>Company Search Result</h2>
+    <div class="preface">
+
+    {% if incorporation_statement is not none %}
+        <p>{{ incorporation_statement }}</p>
+    {% else %}
+        <p>No search results for "{{ owner }}"</p>
+    {% endif %}
+
+    {% if number_of_properties is not none %}
+        <p>{{ number_of_properties }}</p>
+    {% endif %}
+</div>
+
+    {% if titles is not none %}
+        <div class="container">
+            <div class="container" id="resultsButtons">
+                <a href="{{ url_for('download_pdf') }}">
+                    <button>PDF</button>
+                </a>
+                <a href="{{ url_for('download_csv') }}">
+                    <button>CSV</button>
+                </a>
+                <a href="{{ url_for('company_search') }}">
+                    <button>New Search</button>
+                </a>
+                <a href="{{ url_for('index') }}">
+                    <button>Main Menu</button>
+                </a>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title Number</th>
+                            <th>Address</th>
+                            <th>Price Last Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for title in titles %}
+                            <tr>
+                                <td>{{ title.title_number }}</td>
+                                <td>{{ title.address }}</td>
+                                <td>{{ title.price }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Menu</title>
+{% endblock %}
+
+{% block body %}
+    <h1>UK Property Data Search</h1>
+    <div class="container">
+        <a href="{{ url_for('about') }}">
+            <button>About</button>
+        </a>
+        <a href="{{ url_for('download_dataset') }}">
+            <button>Download dataset</button>
+        </a>
+        <a href="{{ url_for('company_search') }}">
+            <button>Search by company name</button>
+        </a>
+        <a href="{{ url_for('title_search') }}">
+            <button>Search by title number</button>
+        </a>
+    </div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>About</title>
+{% endblock %}
+
+{% block body %}
+    <h1>UK Property Data Search</h1>
+    <div class="about-container">
+        <h2>About</h2>
+        <p>
+            This tool creates a searchable database of two datasets published by HM Land Registry:
+            'Overseas companies that own property in England and Wales' and
+            'UK companies that own property in England and Wales'.
+        </p>
+
+        <h3>Overseas companies that own property in England and Wales</h3>
+        <p>
+            This dataset - referred to as "OCOD" - shows every completed record that HM Land Registry
+            has about non-UK Companies or corporate bodies that own land in England and Wales.
+        </p>
+        <p>
+            HM Land Registry defines "non-UK companies or corporate bodies" as:
+        </p>
+        <ul>
+            <li>Corporate bodies</li>
+            <li>Limited companies</li>
+            <li>Public limited companies</li>
+            <li>Unlimited companies</li>
+            <li>Limited liability partnerships</li>
+        </ul>
+
+        <h3>UK companies that own property in England and Wales</h3>
+        <p>
+            This dataset - referred to as "CCOD" - shows freehold or leasehold registered titles in England and Wales that are legally owned by a UK company or a UK corporate body.
+        </p>
+        <p>
+            HM Land Registry defines UK "companies or corporate bodies" as:
+        </p>
+        <ul>
+            <li>Corporations aggregate (a separate legal entity formed by more than one individual person. The corporate aggregate has an existence which is separate from the persons comprising it. The term is used to distinguish them from corporations sole which are legal entities consisting of a single person at any one time)</li>
+            <li>County councils</li>
+            <li>Other local authorities</li>
+            <li>Housing associations</li>
+            <li>Industrial and provident societies</li>
+            <li>Registered societies</li>
+            <li>Limited companies</li>
+            <li>Public limited companies</li>
+            <li>Unlimited companies</li>
+            <li>Limited liability partnerships</li>
+            <li>Community interest companies</li>
+            <li>Societas Europaea (where registered at Companies House)</li>
+            <li>UK Companies with an overseas correspondence address</li>
+        </ul>
+
+        <h3>Data points</h3>
+        <p>The following data points are captured in the database:</p>
+        <ul>
+            <li><strong>Title number:</strong> Unique number which identifies a registered title to land or a caution against first registration.</li>
+            <li><strong>Property Address:</strong> The unformatted address in the register.</li>
+            <li><strong>Price Paid:</strong> The sale price stated on the transfer deed which will be the last recorded sale price available in our published Price Paid Dataset. This may not relate to the sale to the current proprietor which may have been excluded.</li>
+            <li><strong>Owner:</strong> Non-private Individual Name. Name of a company, corporate body, local authority or other organisation or establishment.</li>
+            <li><strong>Country Incorporated:</strong> Country where the company is incorporated</li>
+        </ul>
+
+        <h3>Limitations</h3>
+        <p>
+            The data does not show land or property owned by:
+        </p>
+        <ul>
+            <li>Private individuals</li>
+            <li>Charities including Charitable Incorporated Organisations (CIO)</li>
+        </ul>
+        <p>
+            The data is automatically cleaned to remove as many duplicates as possible. However, this is currently not 100% effective and some duplicate companies with variant spellings remain. HM Land Registry obtains the data from different sources which may contain errors or typos.
+        </p>
+
+        <h2>Technical documentation and source code</h2>
+        <p>
+            Visit the project's <a href="https://github.com/jwmock88/property-database">GitHub repository</a>.
+        </p>
+
+        <h2>License</h2>
+        <p>MIT License</p>
+        <p>Copyright (c) 2024 Joshua Mock</p>
+        <p>
+            Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+            and associated documentation files (the "Software"), to deal in the Software without
+            restriction, including without limitation the rights to use, copy, modify, merge, publish,
+            distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
+            the Software is furnished to do so, subject to the following conditions:
+        </p>
+        <p>
+            The above copyright notice and this permission notice shall be included in all
+            copies or substantial portions of the Software.
+        </p>
+        <p>
+            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+            INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+            PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+            FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+            OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+            DEALINGS IN THE SOFTWARE.
+        </p>
+
+        <h2>Acknowledgements</h2>
+        <p>This page contains public sector information licensed under the Open Government Licence v3.0.</p>
+    </div>
+    <div class="container">
+        <a href="{{ url_for('index') }}">
+            <button type="button" style="width: 120px;">Main Menu</button>
+        </a>
+    </div>
+    <div style="padding-bottom: 20px;"
+{% endblock %}

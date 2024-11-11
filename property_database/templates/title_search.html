@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Title Search</title>
+{% endblock %}
+
+{% block body %}
+    <h1>UK Property Data Search</h1>
+    <h2>Search by Title Number</h2>
+
+    <div>
+        <form action="{{ url_for('title_search') }}" method="POST">
+            <input
+                autocomplete="off"
+                autofocus
+                placeholder="Enter title number"
+                type="text"
+                name="query"
+                title="Enter title number"
+                required
+            >
+            <div class="container">
+                <button type="submit" style="width: 120px;">Search</button>
+                <a href="{{ url_for('index') }}">
+                    <button type="button" style="width: 120px;">Main Menu</button>
+                </a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

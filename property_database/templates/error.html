@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <title>Error</title>
+{% endblock %}
+
+{% block body %}
+  <h1>UK Property Data Search</h1>
+  <h2>Error</h2>
+  <p class="message" id="error">{{ message }}</p>
+  <div class="container">
+    <a href="{{ url_for(retry_url) }}">
+      <button style="width: 120px">Try Again</button>
+    </a>
+    <a href="{{ url_for('index') }}">
+      <button style="width: 120px">Main Menu</button>
+    </a>
+  </div>
+{% endblock %}

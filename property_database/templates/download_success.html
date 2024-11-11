@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block head %}<title>Success</title>{% endblock %}
+
+{% block body %}
+<h1>UK Property Data Search</h1>
+<h2>Download Complete</h2>
+<p class="message" id="success">The dataset has been successfully downloaded and you can now begin running searches.</p>
+<div class="container">
+<a href="{{ url_for('index') }}">
+    <button style="width: 150px;">Main Menu</button>
+</a>
+</div>
+{% endblock %}

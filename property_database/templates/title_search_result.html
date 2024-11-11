@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Title Search Results</title>
+{% endblock %}
+
+{% block body %}
+    <h1>UK Property Data Search</h1>
+    <h2>Title Search Result</h2>
+
+    {% if owners %}
+        <div class="preface">
+            {% if address is not none %}
+                <p>{{ address }}</p>
+            {% endif %}
+
+            {% if price is not none %}
+                <p>{{ price }}</p>
+            {% endif %}
+        </div>
+
+        <div class="container">
+            <div class="container" id="resultsButtons">
+                <a href="{{ url_for('download_pdf') }}">
+                    <button>Save as PDF</button>
+                </a>
+
+                <a href="{{ url_for('download_csv') }}">
+                    <button>Save as CSV</button>
+                </a>
+
+                <a href="{{ url_for('title_search') }}">
+                    <button>New Search</button>
+                </a>
+
+                <a href="{{ url_for('index') }}">
+                    <button>Main Menu</button>
+                </a>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Country of Incorporation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for owner in owners %}
+                            <tr>
+                                <td>{{ owner.company }}</td>
+                                <td>{{ owner.country }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    {% elif title_number %}
+        <p>No search results for "{{ title_number }}"</p>
+
+    {% else %}
+        <p>No search results available.</p>
+    {% endif %}
+
+{% endblock %}

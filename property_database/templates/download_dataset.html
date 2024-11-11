@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Download</title>
+{% endblock %}
+
+{% block body %}
+    <h1>UK Property Data Search</h1>
+    <h2>Download Dataset</h2>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display: none;">
+        <div class="spinner"></div>
+        <div>Loading, please wait...</div>
+    </div>
+
+    <div class="container">
+        <form id="downloadForm" action="{{ url_for('download_dataset') }}" method="POST">
+            <!-- API Key Input (Required) -->
+            <input
+                autocomplete="off"
+                type="password"
+                name="api_key"
+                placeholder="Enter your API key"
+                pattern="^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$"
+                required
+                title="API key must be in the format: 8-4-4-4-12 lowercase letters or numbers"
+            >
+
+            <!-- Download Option Selection -->
+            <fieldset>
+                <legend>Select download option</legend>
+
+                <input
+                    type="radio"
+                    name="download_option"
+                    value="latest"
+                    id="latest"
+                    checked
+                    onclick="toggleDateInputs(false)"
+                >
+                <label for="latest">Latest Data</label>
+
+                <input
+                    type="radio"
+                    name="download_option"
+                    value="historical"
+                    id="historical"
+                    onclick="toggleDateInputs(true)"
+                >
+                <label for="historical">Historical Data</label>
+            </fieldset>
+
+            <div id="date-selection" style="display: none;">
+                <fieldset>
+                    <legend>Enter publication date</legend>
+
+                    <select name="month" id="month">
+                        <option value="" selected disabled>Select Month</option>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+
+                    <select name="year" id="year">
+                        <option value="" selected disabled>Select Year</option>
+                        {% for year in range(2018, current_year + 1) %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </fieldset>
+            </div>
+
+            <div class="container">
+                <button type="submit" style="width: 150px;">Download Data</button>
+                <a href="{{ url_for('index') }}">
+                    <button type="button" style="width: 150px;">Main Menu</button>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function toggleDateInputs(show) {
+            document.getElementById('date-selection').style.display = show ? 'block' : 'none';
+        }
+
+        document.getElementById('downloadForm').onsubmit = function(event) {
+            // Prevent the default form submission so that we can display the loading overlay first
+            event.preventDefault();
+
+            // Show the loading overlay
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            // Then, submit the form after a short delay (optional)
+            setTimeout(function() {
+                document.getElementById('downloadForm').submit();  // This will submit the form after showing the overlay
+            }, 100);  // Adjust the timeout duration as needed
+        };
+    </script>
+{% endblock %}

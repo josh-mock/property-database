@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Company Search</title>
+{% endblock %}
+
+{% block body %}
+    <h1>UK Property Data Search</h1>
+    <h2>Search by Company Name</h2>
+    <div>
+        <form action="{{ url_for('company_search') }}" method="POST">
+            <input
+                autocomplete="off"
+                autofocus
+                placeholder="Enter company name"
+                type="text"
+                name="query"
+                title="Enter company name"
+                style="width: 500px;"
+                id="companySearchInput"
+                required
+            >
+            <ul class="suggestions"></ul> <!-- Dropdown box -->
+            <div class="container">
+                <button type="submit" style="width: 120px;">Search</button>
+                <a href="{{ url_for('index') }}">
+                    <button type="button" style="width: 120px;">Main Menu</button>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='owners.js') }}"></script>
+    <script>
+        let input = document.getElementById('companySearchInput');
+        let suggestionsBox = document.querySelector('.suggestions');
+
+        input.addEventListener('keyup', function(event) {
+            let html = '';
+            if (input.value) {
+                // Populate the suggestions box if there are matches
+                for (let owner of OWNERS) {
+                    if (owner.toLowerCase().startsWith(input.value.toLowerCase())) {
+                        html += `<li>${owner}</li>`;
+                    }
+                }
+                suggestionsBox.innerHTML = html;
+                suggestionsBox.style.display = html ? 'block' : 'none'; // Show if there's content
+            } else {
+                suggestionsBox.style.display = 'none'; // Hide when input is empty
+            }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!input.contains(event.target) && !suggestionsBox.contains(event.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Handle click on suggestion items
+        suggestionsBox.addEventListener('click', function(event) {
+            if (event.target.tagName === 'LI') {
+                input.value = event.target.innerText;
+                suggestionsBox.style.display = 'none'; // Hide after selection
+            }
+        });
+    </script>
+{% endblock %}
