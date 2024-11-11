@@ -21,7 +21,7 @@ pip install -r requirements.txt
 From the root run
 
 ```python
-python property_database.py
+python property_database/app.py
 ```
 
 ## Features
