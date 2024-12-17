@@ -37,6 +37,6 @@ DTYPE_DICT = {
     "Country Incorporated (4)": "object"}
 
 
-DATABASE = "instance/database/titles_owners_database.db"
+DATABASE = "../instance/database/titles_owners_database.db"
 
 OUTPUT_FILE_DIRECTORY = "instance/outputs"
